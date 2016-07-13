@@ -3,41 +3,32 @@
 {% block body %}
   <h1>Website</h1>
 
-  <table>
-    <tbody>
-      <tr>
-        <th>Domain</th>
-        <td>{{ website.domain }}</td>
-      </tr>
-      <tr>
-        <th>Server</th>
-        <td>{{ website.server }}</td>
-      </tr>
-      <tr>
-        <th>Documentroot</th>
-        <td>{{ website.documentRoot }}</td>
-      </tr>
-      <tr>
-        <th>Type</th>
-        <td>{{ website.type }}</td>
-      </tr>
-      <tr>
-        <th>Version</th>
-        <td>{{ website.version }}</td>
-      </tr>
-      <tr>
-        <th>Data</th>
-        <td style="white-space: pre">{{ website.data | json_format }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <dl class="dl-horizontal">
+    <dt>Domain</dt>
+    <dd><a target="website" href="//{{ website.domain }}">{{ website.domain }}</a></dd>
+
+    <dt>Server</dt>
+    <dd>{{ website.server }}</dd>
+
+    <dt>Documentroot</dt>
+    <dd>{{ website.documentRoot }}</dd>
+
+		<dt>Type</dt>
+    <dd>{{ website.type }}</dd>
+
+		<dt>Version</dt>
+    <dd>{{ website.version }}</dd>
+
+		<dt>Data</dt>
+    <dd><div style="white-space: pre; font-family: monospace; max-height: 20em; overflow: scroll">{{ website.data }}</div></dd>
+	</dl>
 
   <ul>
     <li>
       <a href="{{ path('website_index') }}">Back to the list</a>
     </li>
     <li>
-      <a href="{{ path('website_edit', { 'id': website.id }) }}">Edit</a>
+      <a class="btn btn-default" href="{{ path('website_edit', { 'id': website.id }) }}">Edit</a>
     </li>
   </ul>
 {% endblock %}

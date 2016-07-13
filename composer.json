@@ -29,7 +29,12 @@
         "incenteev/composer-parameter-handler": "^2.0",
         "stof/doctrine-extensions-bundle": "^1.2",
         "doctrine/doctrine-migrations-bundle": "^1.1",
-        "braincrafted/bootstrap-bundle": "dev-master"
+        "braincrafted/bootstrap-bundle": "dev-master",
+        "twbs/bootstrap": "^3.3",
+        "symfony/assetic-bundle": "^2.8",
+        "components/jquery": "^3.0",
+        "gedmo/doctrine-extensions": "^2.4",
+        "lexik/form-filter-bundle": "^5.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

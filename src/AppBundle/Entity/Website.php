@@ -3,15 +3,20 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Website
  *
  * @ORM\Table()
  * @ORM\Entity
+ * @Gedmo\Loggable;
  */
 class Website
 {
+    use TimestampableEntity;
+
     /**
      * @var integer
      *

@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use AppBundle\Entity\Website;
 
 class ServerOverviewCommand extends ContainerAwareCommand {
   protected function configure() {
@@ -45,107 +46,7 @@ class ServerOverviewCommand extends ContainerAwareCommand {
     }
   }
 
-  private function data() {
-    $websites = $this->getWebsites();
-
-    $detectors = [
-      'drupal' => [
-        'command' => 'drush pm-list --format=json',
-        'getData' => function(array $output) {
-          $data = implode('', $output);
-          return $data;
-        },
-      ],
-    ];
-
-    foreach ($websites as $website) {
-      $this->output->writeln($website->getDomain());
-
-      if (isset($detectors[$website->getType()])) {
-        $this->output->writeln("\t" . $website->getType());
-
-        $detector = $detectors[$website->getType()];
-
-        $cmdTemplate = 'ssh  -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@' . $website->getServer()
-                     . ' "cd ' . $website->getDocumentRoot() . ' && {{ command }}"';
-
-        $command = isset($detector['getCommand']) ? $detector['getCommand']($domainInfo) : $detector['command'];
-        $cmd = str_replace('{{ command }}', $command, $cmdTemplate);
-
-        $output = null;
-        $code = 0;
-
-        @exec($cmd, $output, $code);
-        if ($code == 0) {
-          $data = $detector['getData']($output);
-          if ($data !== null) {
-            $website
-              ->setData($data);
-            $this->persist($website);
-          }
-        }
-      }
-    }
-  }
-
-  private function detect() {
-    $websites = $this->getWebsites();
-
-    $detectors = [
-      'drupal' => [
-        // 'command' => 'drush status --format=json',
-        'command' => 'hash drush 2>/dev/null && drush status --format=json',
-        'getVersion' => function(array $output) {
-          $data = json_decode(implode('', $output), true);
-          return isset($data['drupal-version']) ? $data['drupal-version'] : null;
-        },
-      ],
-      'symfony' => [
-        'command' => '[ -e ../app/console ] && ../app/console --version 2>/dev/null',
-        'getVersion' => function(array $output) {
-          return preg_match('/version\s+(?<version>[^\s]+)/', $output[0], $matches) ? $matches['version'] : null;
-        },
-      ],
-      'unknown' => [
-        'command' => 'true',
-        'getVersion' => function(array $output) {
-          return 0;
-        },
-      ],
-    ];
-
-    foreach ($websites as $website) {
-      echo $website->getDomain(), PHP_EOL;
-
-      $cmdTemplate = 'ssh  -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@' . $website->getServer()
-                   . ' "cd ' . $website->getDocumentRoot() . ' && {{ command }}"';
-
-      foreach ($detectors as $type => $detector) {
-        $command = isset($detector['getCommand']) ? $detector['getCommand']($domainInfo) : $detector['command'];
-        $cmd = str_replace('{{ command }}', $command, $cmdTemplate);
-
-        $output = null;
-        $code = 0;
-
-        @exec($cmd, $output, $code);
-        // echo var_export([$cmd, $output, $code], true);
-        if ($code == 0) {
-          $version = $detector['getVersion']($output);
-          if ($version !== null) {
-            $website
-              ->setType(isset($detector['type']) ? $detector['type'] : $type)
-              ->setVersion($version);
-            $this->persist($website);
-
-            echo var_export([ $website->getDomain(), $website->getType(), $website->getVersion() ], true);
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  private function update() {
+    private function update() {
     $serverNames = $this->getServerNames();
 
     foreach ($serverNames as $serverName) {
@@ -208,6 +109,135 @@ class ServerOverviewCommand extends ContainerAwareCommand {
     }
   }
 
+  private function detect() {
+    $websites = $this->getWebsites();
+
+    $detectors = [
+      'drupal (multisite)' => [
+        'getCommand' => function(Website $website) {
+          $siteDirectory = 'sites/' . $website->getDomain();
+          return "[ -e $siteDirectory ] && cd $siteDirectory && hash drush 2>/dev/null && drush status --format=json";
+        },
+        'getVersion' => function(array $output) {
+          $data = json_decode(implode('', $output), true);
+          return isset($data['drupal-version']) ? $data['drupal-version'] : null;
+        },
+      ],
+      'drupal' => [
+        'command' => 'hash drush 2>/dev/null && drush status --format=json',
+        'getVersion' => function(array $output) {
+          $data = json_decode(implode('', $output), true);
+          return isset($data['drupal-version']) ? $data['drupal-version'] : null;
+        },
+      ],
+      'symfony' => [
+        'command' => '[ -e ../app/console ] && ../app/console --version 2>/dev/null',
+        'getVersion' => function(array $output) {
+          return preg_match('/version\s+(?<version>[^\s]+)/', $output[0], $matches) ? $matches['version'] : null;
+        },
+      ],
+      'unknown' => [
+        'command' => 'true',
+        'getVersion' => function(array $output) {
+          return 0;
+        },
+      ],
+    ];
+
+    foreach ($websites as $website) {
+      $this->output->writeln($website->getDomain());
+
+      $cmdTemplate = 'ssh  -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@' . $website->getServer()
+                   . ' "cd ' . $website->getDocumentRoot() . ' && {{ command }}"';
+
+      foreach ($detectors as $type => $detector) {
+        $command = isset($detector['getCommand']) ? $detector['getCommand']($website) : $detector['command'];
+        $cmd = str_replace('{{ command }}', $command, $cmdTemplate);
+
+        $output = null;
+        $code = 0;
+
+        @exec($cmd, $output, $code);
+        if ($code == 0) {
+          $version = $detector['getVersion']($output, $website);
+          if ($version !== null) {
+            $website
+              ->setType(isset($detector['type']) ? $detector['type'] : $type)
+              ->setVersion($version);
+            $this->persist($website);
+
+            $this->output->writeln(implode("\t", [ $website->getDomain(), $website->getType(), $website->getVersion() ]));
+            break;
+          }
+        }
+      }
+    }
+  }
+
+
+  private function data() {
+    $websites = $this->getWebsites();
+
+    $detectors = [
+      'drupal (multisite)' => [
+        'getCommand' => function(Website $website) {
+          $siteDirectory = 'sites/' . $website->getDomain();
+          return "cd $siteDirectory && drush pm-list --format=json";
+        },
+        'getData' => function(array $output, Website $website) {
+          $data = implode('', $output);
+          $modules = json_decode($data, true);
+          return json_encode([ 'modules' => $modules ], JSON_PRETTY_PRINT);
+        },
+      ],
+      'drupal' => [
+        'command' => 'drush pm-list --format=json',
+        'getData' => function(array $output) {
+          $data = implode('', $output);
+          $modules = json_decode($data, true);
+          return json_encode([ 'modules' => $modules ], JSON_PRETTY_PRINT);
+        },
+      ],
+      'symfony' => [
+        'command' => 'composer --working-dir=.. show --installed',
+        'getData' => function(array $output) {
+          $data = implode("\n", $output);
+          return $data;
+        },
+      ],
+
+    ];
+
+    foreach ($websites as $website) {
+      $this->output->writeln($website->getDomain());
+
+      if (isset($detectors[$website->getType()])) {
+        $this->output->writeln("\t" . $website->getType());
+
+        $detector = $detectors[$website->getType()];
+
+        $cmdTemplate = 'ssh  -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@' . $website->getServer()
+                     . ' "cd ' . $website->getDocumentRoot() . ' && {{ command }}"';
+
+        $command = isset($detector['getCommand']) ? $detector['getCommand']($website) : $detector['command'];
+        $cmd = str_replace('{{ command }}', $command, $cmdTemplate);
+
+        $output = null;
+        $code = 0;
+
+        @exec($cmd, $output, $code);
+        if ($code == 0) {
+          $data = $detector['getData']($output, $website);
+          if ($data !== null) {
+            $website
+              ->setData($data);
+            $this->persist($website);
+          }
+        }
+      }
+    }
+  }
+
   private function getWebsites() {
     return $this->repo->findAll();
   }
@@ -252,10 +282,6 @@ class ServerOverviewCommand extends ContainerAwareCommand {
           return (string)$record->server;
         }, $records)));
     }
-
-    $serverNames = array_map(function($name) {
-      return $name . '.aakb.dk';
-    }, $serverNames);
 
     return $serverNames;
   }

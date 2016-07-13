@@ -3,6 +3,7 @@
 namespace AppBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -34,6 +35,9 @@ class WebsiteType extends AbstractType
             'disabled' => true,
           ])
             ->add('comments')
+          ->add('save', SubmitType::class, [
+              'label' => 'Save',
+          ])
         ;
     }
 

@@ -14,113 +14,108 @@ use AppBundle\Form\WebsiteType;
  *
  * @Route("/website")
  */
-class WebsiteController extends Controller
-{
-    /**
-     * Lists all Website entities.
-     *
-     * @Route("/", name="website_index")
-     * @Method("GET")
-     */
-    public function indexAction()
-    {
-        $em = $this->getDoctrine()->getManager();
+class WebsiteController extends Controller {
+  /**
+   * Lists all Website entities.
+   *
+   * @Route("/", name="website_index")
+   * @Method("GET")
+   */
+  public function indexAction(Request $request) {
+    $em = $this->getDoctrine()->getManager();
+    $repository =$em->getRepository('AppBundle:Website');
 
-        $websites = $em->getRepository('AppBundle:Website')->findAll();
+    // $form = $this->createForm('AppBundle\Form\WebsiteFilterType');
 
-        return $this->render('website/index.html.twig', array(
-            'websites' => $websites,
-        ));
+    $form = $this->get('form.factory')->create('AppBundle\Form\WebsiteFilterType', NULL, array(
+      'action' => $this->generateUrl('website_index'),
+      'method' => 'GET',
+    ));
+
+    if ($request->query->has($form->getName())) {
+      // manually bind values from the request
+      $form->submit($request->query->get($form->getName()));
+
+      // initialize a query builder
+      $filterBuilder = $repository->createQueryBuilder('e');
+
+      // build the query from the given form object
+      $this->get('lexik_form_filter.query_builder_updater')->addFilterConditions($form, $filterBuilder);
+
+      $query = $filterBuilder->getQuery();
+      $websites = $query->getResult();
+    } else {
+      $websites = $repository->findAll();
     }
 
-    /**
-     * Creates a new Website entity.
-     *
-     * @Route("/new", name="website_new")
-     * @Method({"GET", "POST"})
-     */
-    public function newAction(Request $request)
-    {
-        $website = new Website();
-        $form = $this->createForm('AppBundle\Form\WebsiteType', $website);
-        $form->handleRequest($request);
+    return $this->render('website/index.html.twig', array(
+      'form' => $form->createView(),
+      'websites' => $websites,
+    ));
+  }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($website);
-            $em->flush();
+  /**
+   * Creates a new Website entity.
+   *
+   * @Route("/new", name="website_new")
+   * @Method({"GET", "POST"})
+   */
+  public function newAction(Request $request) {
+    $website = new Website();
+    $form = $this->createForm('AppBundle\Form\WebsiteType', $website);
+    $form->handleRequest($request);
 
-            return $this->redirectToRoute('website_show', array('id' => $website->getId()));
-        }
+    if ($form->isSubmitted() && $form->isValid()) {
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($website);
+      $em->flush();
 
-        return $this->render('website/new.html.twig', array(
-            'website' => $website,
-            'form' => $form->createView(),
-        ));
+      return $this->redirectToRoute('website_show', array('id' => $website->getId()));
     }
 
-    /**
-     * Finds and displays a Website entity.
-     *
-     * @Route("/{id}", name="website_show")
-     * @Method("GET")
-     */
-    public function showAction(Website $website)
-    {
-        $deleteForm = $this->createDeleteForm($website);
+    return $this->render('website/new.html.twig', array(
+      'website' => $website,
+      'form' => $form->createView(),
+    ));
+  }
 
-        return $this->render('website/show.html.twig', array(
-            'website' => $website,
-            'delete_form' => $deleteForm->createView(),
-        ));
+  /**
+   * Finds and displays a Website entity.
+   *
+   * @Route("/{id}", name="website_show")
+   * @Method("GET")
+   */
+  public function showAction(Website $website){
+
+    return $this->render('website/show.html.twig', array(
+      'website' => $website,
+    ));
+  }
+
+  /**
+   * Displays a form to edit an existing Website entity.
+   *
+   * @Route("/{id}/edit", name="website_edit")
+   * @Method({"GET", "POST"})
+   */
+  public function editAction(Request $request, Website $website) {
+    $editForm = $this->createForm('AppBundle\Form\WebsiteType', $website);
+    $editForm->handleRequest($request);
+
+    if ($editForm->isSubmitted() && $editForm->isValid()) {
+      $em = $this->getDoctrine()->getManager();
+      $em->persist($website);
+      $em->flush();
+
+      return $this->redirectToRoute('website_edit', array('id' => $website->getId()));
     }
 
-    /**
-     * Displays a form to edit an existing Website entity.
-     *
-     * @Route("/{id}/edit", name="website_edit")
-     * @Method({"GET", "POST"})
-     */
-    public function editAction(Request $request, Website $website)
-    {
-        $deleteForm = $this->createDeleteForm($website);
-        $editForm = $this->createForm('AppBundle\Form\WebsiteType', $website);
-        $editForm->handleRequest($request);
+    return $this->render('website/edit.html.twig', array(
+      'website' => $website,
+      'edit_form' => $editForm->createView(),
+    ));
+  }
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($website);
-            $em->flush();
-
-            return $this->redirectToRoute('website_edit', array('id' => $website->getId()));
-        }
-
-        return $this->render('website/edit.html.twig', array(
-            'website' => $website,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
-    }
-
-    /**
-     * Deletes a Website entity.
-     *
-     * @Route("/{id}", name="website_delete")
-     * @Method("DELETE")
-     */
-    public function deleteAction(Request $request, Website $website)
-    {
-        $form = $this->createDeleteForm($website);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($website);
-            $em->flush();
-        }
-
-        return $this->redirectToRoute('website_index');
-    }
 
     /**
      * Creates a form to delete a Website entity.
@@ -137,4 +132,5 @@ class WebsiteController extends Controller
             ->getForm()
         ;
     }
+
 }
