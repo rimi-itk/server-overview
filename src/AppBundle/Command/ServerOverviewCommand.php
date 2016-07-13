@@ -272,7 +272,8 @@ class ServerOverviewCommand extends ContainerAwareCommand {
 
         $records = [];
         foreach ($xml->xpath($root) as $el) {
-          if ($el->code == 200 && preg_match('/^[a-z0-9]+/', $el->server)) {
+          if (($el->code == 200 || ($el->code == 301 && $el->redir && strpos((string)$el->redir, (string)$el->domain) !== false))
+              && preg_match('/^[a-z0-9]+/', $el->server)) {
             $records[] = $el;
           }
         }
