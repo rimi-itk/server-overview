@@ -25,8 +25,6 @@ class WebsiteController extends Controller {
     $em = $this->getDoctrine()->getManager();
     $repository =$em->getRepository('AppBundle:Website');
 
-    // $form = $this->createForm('AppBundle\Form\WebsiteFilterType');
-
     $form = $this->get('form.factory')->create('AppBundle\Form\WebsiteFilterType', NULL, array(
       'action' => $this->generateUrl('website_index'),
       'method' => 'GET',

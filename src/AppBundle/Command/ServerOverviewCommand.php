@@ -272,16 +272,15 @@ class ServerOverviewCommand extends ContainerAwareCommand {
 
         $records = [];
         foreach ($xml->xpath($root) as $el) {
-          if (($el->code == 200 || ($el->code == 301 && $el->redir && strpos((string)$el->redir, (string)$el->domain) !== false))
-              && preg_match('/^[a-z0-9]+/', $el->server)) {
-            $records[] = $el;
-          }
+          $records[] = $el;
         }
 
         // Get list of unique server names.
-        $serverNames = array_values(array_unique(array_map(function($record) {
+        $serverNames = array_values(array_filter(array_unique(array_map(function($record) {
           return (string)$record->server;
-        }, $records)));
+        }, $records)), function($value) {
+          return preg_match('/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i', $value);
+        }));
     }
 
     return $serverNames;
