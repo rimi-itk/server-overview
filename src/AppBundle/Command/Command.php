@@ -8,7 +8,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Entity\Website;
 
-abstract class Command extends ContainerAwareCommand {
+abstract class Command extends ContainerAwareCommand
+{
     /**
      * @var InputInterface
      */
@@ -22,40 +23,45 @@ abstract class Command extends ContainerAwareCommand {
     /**
      * @var EntityManagerInterface
      */
-	protected $em;
+    protected $em;
 
     /**
      * @var EntityRepository
      */
-	protected $repo;
+    protected $repo;
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $this->input = $input;
         $this->output = $output;
-		$this->em = $this->getContainer()->get('doctrine')->getEntityManager('default');
-		$this->repo = $this->em->getRepository('AppBundle:Website');
+        $this->em = $this->getContainer()->get('doctrine')->getEntityManager('default');
+        $this->repo = $this->em->getRepository('AppBundle:Website');
 
-		$this->runCommand();
-	}
+        $this->runCommand();
+    }
 
-	abstract protected function runCommand();
+    abstract protected function runCommand();
 
-	protected function getWebsites(array $query = []) {
-		return $this->repo->findBy($query);
-	}
+    protected function getWebsites(array $query = [])
+    {
+        return $this->repo->findBy($query);
+    }
 
-	protected function getWebsite(array $query = []) {
-		$result = $this->repo->findBy($query);
-		return (count($result) > 0) ? $result[0] : null;
-	}
+    protected function getWebsite(array $query = [])
+    {
+        $result = $this->repo->findBy($query);
+        return (count($result) > 0) ? $result[0] : null;
+    }
 
-	protected function persist($entity) {
-		$this->em->persist($entity);
-		$this->em->flush();
-	}
+    protected function persist($entity)
+    {
+        $this->em->persist($entity);
+        $this->em->flush();
+    }
 
-	protected function writeln() {
-		$args = func_get_args();
-		call_user_func_array([ $this->output, 'writeln' ], $args);
-	}
+    protected function writeln()
+    {
+        $args = func_get_args();
+        call_user_func_array([ $this->output, 'writeln' ], $args);
+    }
 }

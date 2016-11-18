@@ -21,19 +21,19 @@ class WebsiteType extends AbstractType
           ])
             ->add('server', null, [
             'disabled' => true,
-          ])
+            ])
             ->add('documentRoot', null, [
             'disabled' => true,
-          ])
+            ])
             ->add('type', null, [
             'disabled' => true,
-          ])
+            ])
             ->add('version', null, [
             'disabled' => true,
-          ])
+            ])
             ->add('data', null, [
             'disabled' => true,
-          ])
+            ])
             ->add('comments')
           ->add('save', SubmitType::class, [
               'label' => 'Save',

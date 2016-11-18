@@ -11,8 +11,8 @@ class DefaultController extends Controller
   /**
    * @Route("/", name="homepage")
    */
-  public function indexAction(Request $request)
-  {
-    return $this->redirectToRoute('website_index');
-  }
+    public function indexAction(Request $request)
+    {
+        return $this->redirectToRoute('website_index');
+    }
 }

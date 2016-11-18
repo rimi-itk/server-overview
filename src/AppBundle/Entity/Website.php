@@ -254,12 +254,14 @@ class Website
         return $this->comments;
     }
 
-  public function __toString() {
-    return json_encode([
-      $this->getDomain(),
-      $this->getDocumentRoot(),
-      $this->getType(),
-      $this->getVersion(),
-    ], JSON_UNESCAPED_SLASHES);
-    return __CLASS__;
-  }}
+    public function __toString()
+    {
+        return json_encode([
+        $this->getDomain(),
+        $this->getDocumentRoot(),
+        $this->getType(),
+        $this->getVersion(),
+        ], JSON_UNESCAPED_SLASHES);
+        return __CLASS__;
+    }
+}
