@@ -1,5 +1,9 @@
 # server-overview
 
+```
+bin/console assetic:dump
+```
+
 Get a list of servers:
 
 ```
