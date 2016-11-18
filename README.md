@@ -3,19 +3,19 @@
 Get a list of servers:
 
 ```
-bin/console server-overview update
+bin/console itksites:update
 ```
 
 Detect (guess) the type and version of each website:
 
 ```
-bin/console server-overview detect
+bin/console itksites:detect
 ```
 
 Get data for each website:
 
 ```
-bin/console server-overview data
+bin/console itksites:data
 ```
 
-Website list: http://server-overview.vm/website/
+Website list: http://itksites.vm/website/
