@@ -39,6 +39,8 @@ twig:
     strict_variables: "%kernel.debug%"
     form_themes:
         - LexikFormFilterBundle:Form:form_div_layout.html.twig
+    globals:
+      site_title: ITK sites
 
 # Doctrine Configuration
 doctrine:

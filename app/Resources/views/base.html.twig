@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8"/>
-    <title>{% block title %}Welcome!{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    {% block stylesheets %}
-      <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" media="screen"/>
-    {% endblock %}
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
-  </head>
-  <body>
-    {% block body %}{% endblock %}
+	<head>
+		<meta charset="UTF-8"/>
+		<title>{% spaceless %}
+			{{ site_title }}
+			{% set _block = block('title') %}
+			{% if _block is not empty %}
+				– {{ _block|raw }}
+			{% endif %}
+		{% endspaceless %}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		{% block stylesheets %}
+			<link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" media="screen"/>
+		{% endblock %}
+		<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
+	</head>
+	<body>
+		{% block body %}{% endblock %}
 
-    {% block javascripts %}
-      <script src="{{ asset('js/jquery.js') }}"></script>
-      <!-- Include all JavaScripts, compiled by Assetic -->
-      <script src="{{ asset('js/bootstrap.js') }}"></script>
-    {% endblock %}
-  </body>
+		{% block javascripts %}
+			<script src="{{ asset('js/jquery.js') }}"></script>
+			<!-- Include all JavaScripts, compiled by Assetic -->
+			<script src="{{ asset('js/bootstrap.js') }}"></script>
+		{% endblock %}
+	</body>
 </html>
