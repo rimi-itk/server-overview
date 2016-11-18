@@ -11,15 +11,17 @@ class DataCommand extends Command
 {
     protected function configure()
     {
+        parent::configure();
         $this
             ->setName('itksites:data')
             ->setDescription('Get data from  all sites')
-            ->addOption('types', null, InputOption::VALUE_REQUIRED, 'Website types');
+            ->addOption('types', null, InputOption::VALUE_REQUIRED, 'Type of sites to process');
     }
 
     protected function runCommand()
     {
-        $websites = $this->getWebsites();
+        $types = array_filter(preg_split('/\s*,\s*/', $this->input->getOption('types'),  PREG_SPLIT_NO_EMPTY));
+        $websites = $types ? $this->getWebsitesByTypes($types) : $this->getWebsites();
 
         $detectors = [
             'drupal (multisite)' => [

@@ -3,6 +3,7 @@ namespace AppBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Entity\Website;
 
@@ -10,14 +11,17 @@ class DetectCommand extends Command
 {
     protected function configure()
     {
+        parent::configure();
         $this
             ->setName('itksites:detect')
-            ->setDescription('Detect type of all sites');
+            ->setDescription('Detect type and version of all sites')
+            ->addOption('types', null, InputOption::VALUE_REQUIRED, 'Type of sites to process');
     }
 
     protected function runCommand()
     {
-        $websites = $this->getWebsites();
+        $types = array_filter(preg_split('/\s*,\s*/', $this->input->getOption('types'),  PREG_SPLIT_NO_EMPTY));
+        $websites = $types ? $this->getWebsitesByTypes($types) : $this->getWebsites();
 
         $detectors = [
             'drupal (multisite)' => [

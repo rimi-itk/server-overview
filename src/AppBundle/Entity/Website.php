@@ -10,7 +10,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  * Website
  *
  * @ORM\Table()
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\WebsiteRepository")
  * @Gedmo\Loggable;
  */
 class Website

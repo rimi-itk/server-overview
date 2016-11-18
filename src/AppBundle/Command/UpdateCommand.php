@@ -10,6 +10,7 @@ class UpdateCommand extends Command
 {
     protected function configure()
     {
+        parent::configure();
         $this
             ->setName('itksites:update')
             ->setDescription('Update list of sites');
