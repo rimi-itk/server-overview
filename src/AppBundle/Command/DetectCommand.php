@@ -1,11 +1,17 @@
 <?php
+
+/*
+ * This file is part of ITK Sites.
+ *
+ * (c) 2018 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace AppBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Entity\Website;
+use Symfony\Component\Console\Input\InputOption;
 
 class DetectCommand extends Command
 {
@@ -20,17 +26,19 @@ class DetectCommand extends Command
 
     protected function runCommand()
     {
-        $types = array_filter(preg_split('/\s*,\s*/', $this->input->getOption('types'),  PREG_SPLIT_NO_EMPTY));
+        $types = array_filter(preg_split('/\s*,\s*/', $this->input->getOption('types'), PREG_SPLIT_NO_EMPTY));
         $websites = $types ? $this->getWebsitesByTypes($types) : $this->getWebsites();
 
         $detectors = [
             'drupal (multisite)' => [
                 'getCommand' => function (Website $website) {
-                    $siteDirectory = 'sites/' . $website->getDomain();
+                    $siteDirectory = 'sites/'.$website->getDomain();
+
                     return "[ -e $siteDirectory ] && cd $siteDirectory && hash drush 2>/dev/null && drush status --format=json";
                 },
                 'getVersion' => function (array $output) {
                     $data = json_decode(implode('', $output), true);
+
                     return isset($data['drupal-version']) ? $data['drupal-version'] : null;
                 },
             ],
@@ -38,6 +46,7 @@ class DetectCommand extends Command
                 'command' => 'hash drush 2>/dev/null && drush status --format=json',
                 'getVersion' => function (array $output) {
                     $data = json_decode(implode('', $output), true);
+
                     return isset($data['drupal-version']) ? $data['drupal-version'] : null;
                 },
             ],
@@ -58,8 +67,8 @@ class DetectCommand extends Command
         foreach ($websites as $website) {
             $this->output->writeln($website->getDomain());
 
-            $cmdTemplate = 'ssh  -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@' . $website->getServer()
-                                     . ' "cd ' . $website->getDocumentRoot() . ' && {{ command }}"';
+            $cmdTemplate = 'ssh  -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$website->getServer()
+                                     .' "cd '.$website->getDocumentRoot().' && {{ command }}"';
 
             foreach ($detectors as $type => $detector) {
                 $command = isset($detector['getCommand']) ? $detector['getCommand']($website) : $detector['command'];
@@ -69,15 +78,16 @@ class DetectCommand extends Command
                 $code = 0;
 
                 @exec($cmd, $output, $code);
-                if ($code == 0) {
+                if (0 === $code) {
                     $version = $detector['getVersion']($output, $website);
-                    if ($version !== null) {
+                    if (null !== $version) {
                         $website
                             ->setType(isset($detector['type']) ? $detector['type'] : $type)
                             ->setVersion($version);
                         $this->persist($website);
 
-                        $this->output->writeln(implode("\t", [ $website->getDomain(), $website->getType(), $website->getVersion() ]));
+                        $this->output->writeln(implode("\t", [$website->getDomain(), $website->getType(), $website->getVersion()]));
+
                         break;
                     }
                 }

@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of ITK Sites.
+ *
+ * (c) 2018 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -8,9 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller
 {
-  /**
-   * @Route("/", name="homepage")
-   */
+    /**
+     * @Route("/", name="homepage")
+     */
     public function indexAction(Request $request)
     {
         return $this->redirectToRoute('website_index');

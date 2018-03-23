@@ -48,3 +48,5 @@
 */Entity/*~
 web/css
 web/js
+.php_cs.cache
+.web-server-pid

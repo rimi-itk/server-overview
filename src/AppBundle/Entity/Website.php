@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of ITK Sites.
+ *
+ * (c) 2018 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -7,7 +15,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
- * Website
+ * Website.
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="AppBundle\Entity\WebsiteRepository")
@@ -18,7 +26,7 @@ class Website
     use TimestampableEntity;
 
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -75,11 +83,22 @@ class Website
      */
     private $comments;
 
+    public function __toString()
+    {
+        return json_encode([
+        $this->getDomain(),
+        $this->getDocumentRoot(),
+        $this->getType(),
+        $this->getVersion(),
+        ], JSON_UNESCAPED_SLASHES);
+
+        return __CLASS__;
+    }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -87,7 +106,7 @@ class Website
     }
 
     /**
-     * Set domain
+     * Set domain.
      *
      * @param string $domain
      *
@@ -101,7 +120,7 @@ class Website
     }
 
     /**
-     * Get domain
+     * Get domain.
      *
      * @return string
      */
@@ -111,7 +130,7 @@ class Website
     }
 
     /**
-     * Set server
+     * Set server.
      *
      * @param string $server
      *
@@ -125,7 +144,7 @@ class Website
     }
 
     /**
-     * Get server
+     * Get server.
      *
      * @return string
      */
@@ -135,7 +154,7 @@ class Website
     }
 
     /**
-     * Set documentRoot
+     * Set documentRoot.
      *
      * @param string $documentRoot
      *
@@ -149,7 +168,7 @@ class Website
     }
 
     /**
-     * Get documentRoot
+     * Get documentRoot.
      *
      * @return string
      */
@@ -159,7 +178,7 @@ class Website
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
      *
@@ -173,7 +192,7 @@ class Website
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
@@ -183,7 +202,7 @@ class Website
     }
 
     /**
-     * Set version
+     * Set version.
      *
      * @param string $version
      *
@@ -197,7 +216,7 @@ class Website
     }
 
     /**
-     * Get version
+     * Get version.
      *
      * @return string
      */
@@ -207,7 +226,7 @@ class Website
     }
 
     /**
-     * Set data
+     * Set data.
      *
      * @param string $data
      *
@@ -221,7 +240,7 @@ class Website
     }
 
     /**
-     * Get data
+     * Get data.
      *
      * @return string
      */
@@ -230,8 +249,8 @@ class Website
         return $this->data;
     }
 
-  /**
-     * Set comments
+    /**
+     * Set comments.
      *
      * @param string $comments
      *
@@ -245,23 +264,12 @@ class Website
     }
 
     /**
-     * Get comments
+     * Get comments.
      *
      * @return string
      */
     public function getComments()
     {
         return $this->comments;
-    }
-
-    public function __toString()
-    {
-        return json_encode([
-        $this->getDomain(),
-        $this->getDocumentRoot(),
-        $this->getType(),
-        $this->getVersion(),
-        ], JSON_UNESCAPED_SLASHES);
-        return __CLASS__;
     }
 }

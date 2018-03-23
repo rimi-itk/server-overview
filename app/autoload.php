@@ -1,10 +1,18 @@
 <?php
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
+/*
+ * This file is part of ITK Sites.
+ *
+ * (c) 2018 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 use Composer\Autoload\ClassLoader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 
 /**
- * @var ClassLoader $loader
+ * @var ClassLoader
  */
 $loader = require __DIR__.'/../vendor/autoload.php';
 

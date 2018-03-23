@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of ITK Sites.
+ *
+ * (c) 2018 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace AppBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
@@ -11,7 +19,7 @@ class WebsiteType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -46,8 +54,8 @@ class WebsiteType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Entity\Website'
-        ));
+        $resolver->setDefaults([
+            'data_class' => 'AppBundle\Entity\Website',
+        ]);
     }
 }
