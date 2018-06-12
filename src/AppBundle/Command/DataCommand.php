@@ -34,7 +34,7 @@ class DataCommand extends Command
                 'getCommand' => function (Website $website) {
                     $siteDirectory = 'sites/'.$website->getDomain();
 
-                    return "cd $siteDirectory && drush pm-list --format=csv";
+                    return "cd $siteDirectory && drush pm-list --format=json";
                 },
                 'getData' => function (array $output, Website $website) {
                     $data = implode(PHP_EOL, $output);
@@ -43,7 +43,7 @@ class DataCommand extends Command
                 },
             ],
             'drupal' => [
-                'command' => 'drush pm-list --format=csv',
+                'command' => 'drush pm-list --format=json',
                 'getData' => function (array $output) {
                     $data = implode(PHP_EOL, $output);
 
@@ -51,7 +51,7 @@ class DataCommand extends Command
                 },
             ],
             'symfony' => [
-                'command' => 'composer --working-dir=.. show --installed',
+                'command' => 'composer --working-dir=.. show --format=json',
                 'getData' => function (array $output) {
                     $data = implode("\n", $output);
 
@@ -68,8 +68,8 @@ class DataCommand extends Command
 
                 $detector = $detectors[$website->getType()];
 
-                $cmdTemplate = 'ssh  -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$website->getServer()
-                                         .' "cd '.$website->getDocumentRoot().' && {{ command }}"';
+                $cmdTemplate = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$website->getServer()
+                                    .' "cd '.$website->getDocumentRoot().' && {{ command }}"';
 
                 $command = isset($detector['getCommand']) ? $detector['getCommand']($website) : $detector['command'];
                 $cmd = str_replace('{{ command }}', $command, $cmdTemplate);
@@ -81,8 +81,7 @@ class DataCommand extends Command
                 if (0 === $code) {
                     $data = $detector['getData']($output, $website);
                     if (null !== $data) {
-                        $website
-                            ->setData($data);
+                        $website->setData($data);
                         $this->persist($website);
                     }
                 }

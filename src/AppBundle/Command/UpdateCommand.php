@@ -10,6 +10,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Entity\Website;
+
 class UpdateCommand extends Command
 {
     protected function configure()
@@ -25,12 +27,20 @@ class UpdateCommand extends Command
         $serverNames = $this->getServerNames();
 
         foreach ($serverNames as $serverName) {
+            $existing = $this->repo->findBy(['server' => $serverName]);
+            foreach ($existing as $existing) {
+                $this->em->remove($existing);
+            }
+            $this->em->flush();
+
             $this->writeln($serverName);
             // $cmd = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@' . $serverName . ' "for f in \$(sudo /usr/sbin/apachectl  -t -D DUMP_VHOSTS | grep namevhost | sed \'s/^.*namevhost *\([^ ]*\) *(\([^:)]*\).*$/\2/\'); do echo --- \$f; grep \'^[[:space:]]*\(Server\(Name\|Alias\)\|DocumentRoot\)\' \$f; done"';
             $cmd = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$serverName.' "for f in /etc/{apache,nginx}*/sites-enabled/*; do echo --- \$f; [ -e $f ] && grep --no-messages \'^[[:space:]]*\(server_name\|root\|Server\(Name\|Alias\)\|DocumentRoot\)\' \$f; done"';
+
             $lines = [];
             $code = 0;
             exec($cmd, $lines, $code);
+
             if (!empty($lines)) {
                 $lines = array_map(function ($line) {
                     return trim($line);
@@ -67,14 +77,14 @@ class UpdateCommand extends Command
                                     foreach ($domains as $domain) {
                                         $website = $this->getWebsite(['domain' => $domain]);
                                         if (!$website) {
-                                            $website = new \AppBundle\Entity\Website();
+                                            $website = new Website();
                                         }
                                         $website
                                             ->setDomain($domain)
                                             ->setServer($serverName)
                                             ->setDocumentRoot($documentRoot);
 
-                                        $this->writeln('  '.$website); //->getDomain());
+                                        $this->writeln('  '.$website);
 
                                         $this->persist($website);
                                     }
@@ -91,7 +101,7 @@ class UpdateCommand extends Command
 
     private function getServerNames()
     {
-        return $this->getContainer()->getParameter('server_names');
+        return $this->filterServerNames($this->getContainer()->getParameter('server_names'));
         $serverNames = [];
 
         $configuration = $this->getContainer()->getParameter('server_list');

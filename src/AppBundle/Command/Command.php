@@ -43,6 +43,8 @@ abstract class Command extends ContainerAwareCommand
     protected function configure()
     {
         $this->addOption('list-types', null, InputOption::VALUE_NONE, 'List all website types');
+        $this->addOption('server', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Server to process');
+        $this->addOption('domain', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Domain to process');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -75,12 +77,43 @@ abstract class Command extends ContainerAwareCommand
 
     protected function getWebsites(array $query = [])
     {
-        return $this->repo->findBy($query);
+        return $this->filterWebsites($this->repo->findBy($query));
     }
 
     protected function getWebsitesByTypes(array $types)
     {
-        return $this->repo->findByTypes($types);
+        return $this->filterWebsites($this->repo->findByTypes($types));
+    }
+
+    protected function filterWebsites(array $websites)
+    {
+        $servers = $this->input->getOption('server');
+        if (count($servers) > 0) {
+            $websites = array_filter($websites, function (Website $website) use ($servers) {
+                return in_array($website->getServer(), $servers, true);
+            });
+        }
+
+        $domains = $this->input->getOption('domain');
+        if (count($domains) > 0) {
+            $websites = array_filter($websites, function (Website $website) use ($domains) {
+                return in_array($website->getDomain(), $domains, true);
+            });
+        }
+
+        return $websites;
+    }
+
+    protected function filterServerNames(array $serverNames)
+    {
+        $servers = $this->input->getOption('server');
+        if (count($servers) > 0) {
+            $serverNames = array_filter($serverNames, function ($serverName) use ($servers) {
+                return in_array($serverName, $servers, true);
+            });
+        }
+
+        return $serverNames;
     }
 
     protected function getWebsite(array $query = [])

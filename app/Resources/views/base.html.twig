@@ -4,9 +4,8 @@
 		<meta charset="UTF-8"/>
 		<title>{% spaceless %}
 			{{ site_title }}
-			{% set _block = block('title') %}
-			{% if _block is not empty %}
-				– {{ _block|raw }}
+			{% if block('title') is defined %}
+				–  {{ block('title')|raw }}
 			{% endif %}
 		{% endspaceless %}</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -16,7 +15,11 @@
 		<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
 	</head>
 	<body>
-		{% block body %}{% endblock %}
+		{% block container %}
+			<div class="container-fluid">
+				{% block body %}{% endblock %}
+			</div>
+		{% endblock %}
 
 		{% block javascripts %}
 			<script src="{{ asset('js/jquery.js') }}"></script>
