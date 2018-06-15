@@ -1,0 +1,55 @@
+{% if view == 'list' %}
+	{{ value ? '…' : '–' }}
+{% elseif view == 'show' %}
+	{% set data = value|json_decode %}
+	<div class="website-data" style="max-height: 32em; overflow: auto;">
+		{% if item.type matches '/^drupal/' %}
+
+			<table class="table table-sm table-hover">
+				<thead>
+					<th>Package</th>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Status</th>
+					<th>Version</th>
+				</thead>
+				{% for status, items in data %}
+					<tbody>
+						{% for item in items %}
+							<tr>
+								<td>{{ item.package }}</td>
+								<td>{{ item.name }}</td>
+								<td>{{ item.type }}</td>
+								<td>{{ item.status }}</td>
+								<td>{{ item.version }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				{% endfor %}
+			</table>
+
+		{% elseif item.type matches '/^symfony/' %}
+
+			<table class="table table-sm table-hover">
+				<thead>
+					<th>Name</th>
+					<th>Version</th>
+					<th>Description</th>
+				</thead>
+				{% for status, items in data %}
+					<tbody>
+						{% for item in items %}
+							<tr>
+								<td>{{ item.name }}</td>
+								<td>{{ item.version }}</td>
+								<td>{{ item.description }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				{% endfor %}
+			</table>
+		{% else %}
+			{{ dump(data) }}
+		{% endif %}
+	</div>
+{% endif %}

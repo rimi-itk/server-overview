@@ -1,25 +1,19 @@
 # server-overview
 
-```
-bin/console assetic:dump
-```
-
 Get a list of servers:
 
 ```
-bin/console itksites:update
+bin/console app:website:update
 ```
 
 Detect (guess) the type and version of each website:
 
 ```
-bin/console itksites:detect
+bin/console app:website:detect
 ```
 
 Get data for each website:
 
 ```
-bin/console itksites:data
+bin/console app:website:data
 ```
-
-Website list: http://itksites.vm/website/
