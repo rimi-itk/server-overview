@@ -49,7 +49,7 @@
 				{% endfor %}
 			</table>
 		{% else %}
-			{{ dump(data) }}
+			{{ data|json_encode(constant('JSON_PRETTY_PRINT')) }}
 		{% endif %}
 	</div>
 {% endif %}
