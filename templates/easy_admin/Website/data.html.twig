@@ -18,8 +18,8 @@
 						{% for item in items %}
 							<tr>
 								<td>{{ item.package }}</td>
-								<td>{{ item.name }}</td>
-								<td>{{ item.type }}</td>
+								<td>{{ item.name|default(item.display_name|default('–')) }}</td>
+								<td>{{ item.type|default('–') }}</td>
 								<td>{{ item.status }}</td>
 								<td>{{ item.version }}</td>
 							</tr>
