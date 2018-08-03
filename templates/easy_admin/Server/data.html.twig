@@ -1,9 +1,18 @@
 {% if view == 'list' %}
 	{% for app, info in value %}
 		{% if value[app]['version']|default(false) %}
-			<a class="label label-primary">{{ app }} {{ value[app]['version']|default('–') }}</a>
+			<span class="label label-primary">{{ app }} {{ value[app]['version']|default('–') }}</span>
 		{% endif %}
 	{% endfor %}
 {% elseif view == 'show' %}
-	<pre style="max-height: 20em">{{ value|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+	<table class="table">
+		{% for app, info in value %}
+			<tr>
+				{% if value[app]['version']|default(false) %}
+					<th>{{ app }}</th>
+					<td>{{ value[app]['version']|default('–') }}</td>
+				{% endif %}
+			</tr>
+		{% endfor %}
+	</table>
 {% endif %}
