@@ -1,0 +1,9 @@
+{% if view == 'list' %}
+	{% for app, info in value %}
+		{% if value[app]['version']|default(false) %}
+			<a class="label label-primary">{{ app }} {{ value[app]['version']|default('–') }}</a>
+		{% endif %}
+	{% endfor %}
+{% elseif view == 'show' %}
+	{{ dump(value) }}
+{% endif %}

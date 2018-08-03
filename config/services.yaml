@@ -2,8 +2,6 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
-    env(SERVER_NAMES): ''
-    server_names: '%env(SERVER_NAMES)%'
 
 services:
     # default configuration for services in *this* file

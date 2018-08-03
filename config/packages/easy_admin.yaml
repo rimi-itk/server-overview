@@ -1,11 +1,38 @@
 easy_admin:
   entities:
+     Server:
+       class: App\Entity\Server
+       disabled_actions: ['delete']
+       list:
+         actions: ['show']
+         max_results: 50
+         fields:
+           - property: name
+           - property: data
+             template: data.html.twig
+             sortable: false
+           - property: websites
+           - property: enabled
+
+       show:
+         fields:
+           - property: name
+           - property: enabled
+           - property: data
+             template: data.html.twig
+           - property: websites
+
+       form:
+         fields:
+           - property: name
+           - property: enabled
+
      Website:
        class: App\Entity\Website
        disabled_actions: ['new', 'edit', 'delete']
        list:
          actions: ['show']
-         #   max_results: 50
+         max_results: 300
          fields:
            - property: domain
              template: domain.html.twig

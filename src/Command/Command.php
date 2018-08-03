@@ -10,13 +10,16 @@
 
 namespace App\Command;
 
+use App\Entity\Server;
 use App\Entity\Website;
+use App\Repository\ServerRepository;
+use App\Repository\WebsiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
 abstract class Command extends ContainerAwareCommand
 {
@@ -36,9 +39,21 @@ abstract class Command extends ContainerAwareCommand
     protected $em;
 
     /**
-     * @var EntityRepository
+     * @var ServerRepository
      */
-    protected $repo;
+    protected $serverRepository;
+
+    /**
+     * @var WebsiteRepository
+     */
+    protected $websiteRepository;
+
+    public function __construct(ServerRepository $serverRepository, WebsiteRepository $websiteRepository)
+    {
+        parent::__construct();
+        $this->serverRepository = $serverRepository;
+        $this->websiteRepository = $websiteRepository;
+    }
 
     protected function configure()
     {
@@ -52,7 +67,6 @@ abstract class Command extends ContainerAwareCommand
         $this->input = $input;
         $this->output = $output;
         $this->em = $this->getContainer()->get('doctrine')->getEntityManager('default');
-        $this->repo = $this->em->getRepository(Website::class);
 
         if ((bool) $this->input->getOption('list-types')) {
             $types = [];
@@ -75,14 +89,26 @@ abstract class Command extends ContainerAwareCommand
 
     abstract protected function runCommand();
 
+    protected function runOnServer(Server $server, $command)
+    {
+        $sshArguments = '-o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A';
+        $host = 'deploy@'.$server->getName();
+
+        $ssh = "ssh $sshArguments $host '$command'";
+        $process = new Process($ssh);
+        $process->mustRun();
+
+        return $process->getOutput();
+    }
+
     protected function getWebsites(array $query = [])
     {
-        return $this->filterWebsites($this->repo->findBy($query));
+        return $this->filterWebsites($this->websiteRepository->findBy($query));
     }
 
     protected function getWebsitesByTypes(array $types)
     {
-        return $this->filterWebsites($this->repo->findByTypes($types));
+        return $this->filterWebsites($this->websiteRepository->findByTypes($types));
     }
 
     protected function filterWebsites(array $websites)
@@ -118,7 +144,7 @@ abstract class Command extends ContainerAwareCommand
 
     protected function getWebsite(array $query = [])
     {
-        $result = $this->repo->findBy($query);
+        $result = $this->websiteRepository->findBy($query);
 
         return (count($result) > 0) ? $result[0] : null;
     }

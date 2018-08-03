@@ -18,7 +18,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  * Website.
  *
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="App\Entity\WebsiteRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\WebsiteRepository")
  * @Gedmo\Loggable;
  */
 class Website
@@ -42,9 +42,8 @@ class Website
     private $domain;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="server", type="string", length=255, nullable=false)
+     * @ORM\ManyToOne(targetEntity="App\Entity\Server", inversedBy="websites")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $server;
 
@@ -132,11 +131,11 @@ class Website
     /**
      * Set server.
      *
-     * @param string $server
+     * @param Server $server
      *
      * @return Website
      */
-    public function setServer($server)
+    public function setServer(Server $server)
     {
         $this->server = $server;
 
@@ -146,7 +145,7 @@ class Website
     /**
      * Get server.
      *
-     * @return string
+     * @return Server
      */
     public function getServer()
     {

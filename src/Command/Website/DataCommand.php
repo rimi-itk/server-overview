@@ -8,8 +8,9 @@
  * This source file is subject to the MIT license.
  */
 
-namespace App\Command;
+namespace App\Command\Website;
 
+use App\Command\Command;
 use App\Entity\Website;
 use Symfony\Component\Console\Input\InputOption;
 
