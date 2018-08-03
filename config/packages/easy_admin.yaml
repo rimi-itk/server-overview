@@ -1,4 +1,6 @@
 easy_admin:
+  site_name: 'ITK sites'
+
   entities:
      Server:
        class: App\Entity\Server
