@@ -1,6 +1,9 @@
 easy_admin:
   site_name: 'ITK sites'
 
+  design:
+    menu: [Website, Server]
+
   entities:
      Server:
        class: App\Entity\Server
