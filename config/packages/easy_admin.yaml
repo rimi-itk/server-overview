@@ -8,6 +8,11 @@ easy_admin:
        list:
          actions: ['show']
          max_results: 300
+         form_filters:
+           # - property: server
+           - property: type
+             type_options:
+               choices_static_callback: [getValuesList, [type]]
          fields:
            - property: domain
              template: domain.html.twig

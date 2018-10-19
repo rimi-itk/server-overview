@@ -11,6 +11,7 @@
 namespace App\Repository;
 
 use App\Entity\Website;
+use App\Kernel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -28,5 +29,24 @@ class WebsiteRepository extends ServiceEntityRepository
             ->setParameter('types', $types)
             ->getQuery()
             ->getResult();
+    }
+
+    public function getValuesList($type)
+    {
+        switch ($type) {
+            case 'type':
+                $result = $this->createQueryBuilder('w')
+                    ->select('type, count(*) as cardinality')
+                    ->groupBy('type')
+                    ->getQuery()
+                    ->getResult();
+                header('Content-type: text/plain'); echo var_export($result, true); die(__FILE__.':'.__LINE__.':'.__METHOD__);
+                foreach ($result as $item) {
+                }
+                return ['drupal' => 'Drupal'];
+                break;
+        }
+
+        return [];
     }
 }

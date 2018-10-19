@@ -1,4 +1,7 @@
 {
+    "alterphp/easyadmin-extension-bundle": {
+        "version": "v1.3.1"
+    },
     "api-platform/api-pack": {
         "version": "1.1.0"
     },
@@ -115,6 +118,9 @@
     },
     "egulias/email-validator": {
         "version": "2.1.4"
+    },
+    "facebook/webdriver": {
+        "version": "1.6.0"
     },
     "fig/link-util": {
         "version": "1.0.0"
@@ -337,6 +343,9 @@
     },
     "symfony/orm-pack": {
         "version": "v1.0.5"
+    },
+    "symfony/panther": {
+        "version": "v0.2.0"
     },
     "symfony/phpunit-bridge": {
         "version": "3.3",
