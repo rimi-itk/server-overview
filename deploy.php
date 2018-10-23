@@ -21,7 +21,7 @@ add('writable_dirs', []);
 
 
 // Hosts
-inventory('hosts.yml');
+inventory('hosts.yaml');
 
 // Tasks
 task('build', function () {
