@@ -26,7 +26,6 @@ class WebsiteRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('w')
             ->andWhere('w.type IN (:types)')
             ->setParameter('types', $types)
-            ->orderBy('s.name', Criteria::ASC)
             ->getQuery()
             ->getResult();
     }
