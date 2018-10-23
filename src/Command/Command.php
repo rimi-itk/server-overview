@@ -114,16 +114,16 @@ abstract class Command extends ContainerAwareCommand
     protected function filterWebsites(array $websites)
     {
         $servers = $this->input->getOption('server');
-        if (count($servers) > 0) {
+        if (\count($servers) > 0) {
             $websites = array_filter($websites, function (Website $website) use ($servers) {
-                return in_array($website->getServer(), $servers, true);
+                return \in_array($website->getServer(), $servers, true);
             });
         }
 
         $domains = $this->input->getOption('domain');
-        if (count($domains) > 0) {
+        if (\count($domains) > 0) {
             $websites = array_filter($websites, function (Website $website) use ($domains) {
-                return in_array($website->getDomain(), $domains, true);
+                return \in_array($website->getDomain(), $domains, true);
             });
         }
 
@@ -133,9 +133,9 @@ abstract class Command extends ContainerAwareCommand
     protected function filterServerNames(array $serverNames)
     {
         $servers = $this->input->getOption('server');
-        if (count($servers) > 0) {
+        if (\count($servers) > 0) {
             $serverNames = array_filter($serverNames, function ($serverName) use ($servers) {
-                return in_array($serverName, $servers, true);
+                return \in_array($serverName, $servers, true);
             });
         }
 
@@ -146,7 +146,7 @@ abstract class Command extends ContainerAwareCommand
     {
         $result = $this->websiteRepository->findBy($query);
 
-        return (count($result) > 0) ? $result[0] : null;
+        return (\count($result) > 0) ? $result[0] : null;
     }
 
     protected function persist($entity)
@@ -157,7 +157,7 @@ abstract class Command extends ContainerAwareCommand
 
     protected function writeln()
     {
-        $args = func_get_args();
-        call_user_func_array([$this->output, 'writeln'], $args);
+        $args = \func_get_args();
+        \call_user_func_array([$this->output, 'writeln'], $args);
     }
 }

@@ -18,4 +18,6 @@ return [
     Lexik\Bundle\FormFilterBundle\LexikFormFilterBundle::class => ['all' => true],
     EasyCorp\Bundle\EasyAdminBundle\EasyAdminBundle::class => ['all' => true],
     ItkDev\DatabaseBundle\ItkDevDatabaseBundle::class => ['all' => true],
+    Nelmio\CorsBundle\NelmioCorsBundle::class => ['all' => true],
+    ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle::class => ['all' => true],
 ];

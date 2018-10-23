@@ -51,11 +51,11 @@ class UpdateCommand extends Command
                         $indexes[] = $index;
                     }
                 }
-                $indexes[] = count($lines);
+                $indexes[] = \count($lines);
 
                 foreach ($indexes as $index => $value) {
                     if ($index > 0) {
-                        $chunk = array_slice($lines, $indexes[$index - 1], $value - $indexes[$index - 1], true);
+                        $chunk = \array_slice($lines, $indexes[$index - 1], $value - $indexes[$index - 1], true);
                         $configFilename = null;
                         $domains = null;
                         $documentRoot = null;

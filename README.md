@@ -17,3 +17,9 @@ Get data for each website:
 ```
 bin/console app:website:data
 ```
+
+## Deployment
+
+```sh
+./vendor/bin/dep deploy production
+```

@@ -4,6 +4,8 @@
     "require": {
         "php": "~7.2.0",
         "ext-iconv": "*",
+        "api-platform/api-pack": "^1.1",
+        "beberlei/DoctrineExtensions": "^1.1",
         "easycorp/easyadmin-bundle": "^1.17",
         "itk-dev/database-bundle": "^1.2",
         "lexik/form-filter-bundle": "^5.0",
@@ -28,7 +30,8 @@
         "symfony/web-link": "^4.1",
         "symfony/webpack-encore-pack": "*",
         "symfony/yaml": "^4.1",
-        "twig/extensions": "^1.5"
+        "twig/extensions": "^1.5",
+        "webonyx/graphql-php": "^0.12.6"
     },
     "require-dev": {
         "deployer/deployer": "^6.2",

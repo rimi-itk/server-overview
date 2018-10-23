@@ -10,6 +10,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use App\Filter\RegexpFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -20,6 +24,12 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="App\Repository\WebsiteRepository")
  * @Gedmo\Loggable;
+ * @ApiResource(
+ *     collectionOperations={"get"},
+ *     itemOperations={"get"}
+ * )
+ * @ApiFilter(SearchFilter::class, properties={"domain", "server.name", "type", "version", "data"})
+ * @ApiFilter(RegexpFilter::class, properties={"domain", "server.name", "type", "version", "data"})
  */
 class Website
 {
