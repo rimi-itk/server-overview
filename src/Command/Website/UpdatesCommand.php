@@ -14,14 +14,14 @@ use App\Command\Command;
 use App\Entity\Website;
 use Symfony\Component\Console\Input\InputOption;
 
-class DataCommand extends Command
+class UpdatesCommand extends Command
 {
     protected function configure()
     {
         parent::configure();
         $this
-            ->setName('app:website:data')
-            ->setDescription('Get data from sites')
+            ->setName('app:website:updates')
+            ->setDescription('Get update data from sites')
             ->addOption('types', null, InputOption::VALUE_REQUIRED, 'Type of sites to process');
     }
 
@@ -71,14 +71,6 @@ class DataCommand extends Command
                     return json_encode($buckets);
                 },
             ],
-            'symfony' => [
-                'command' => 'composer --working-dir=.. show --format=json',
-                'getData' => function (array $output) {
-                    $data = implode(PHP_EOL, $output);
-
-                    return $data;
-                },
-            ],
         ];
 
         foreach ($websites as $website) {
@@ -102,7 +94,7 @@ class DataCommand extends Command
                 if (0 === $code) {
                     $data = $detector['getData']($output, $website);
                     if (null !== $data) {
-                        $website->setData($data);
+                        $website->setUupdates($data);
                         $this->persist($website);
                     }
                 }

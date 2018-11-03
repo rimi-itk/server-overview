@@ -92,6 +92,21 @@ class Website
      */
     private $comments;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $errors;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $updates;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $siteRoot;
+
     public function __toString()
     {
         return json_encode([
@@ -280,5 +295,41 @@ class Website
     public function getComments()
     {
         return $this->comments;
+    }
+
+    public function getErrors(): ?string
+    {
+        return $this->errors;
+    }
+
+    public function setErrors(?string $errors): self
+    {
+        $this->errors = $errors;
+
+        return $this;
+    }
+
+    public function getUpdates(): ?string
+    {
+        return $this->updates;
+    }
+
+    public function setUpdates(?string $updates): self
+    {
+        $this->updates = $updates;
+
+        return $this;
+    }
+
+    public function getSiteRoot(): ?string
+    {
+        return $this->siteRoot;
+    }
+
+    public function setSiteRoot(?string $siteRoot): self
+    {
+        $this->siteRoot = $siteRoot;
+
+        return $this;
     }
 }

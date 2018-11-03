@@ -111,6 +111,10 @@ abstract class Command extends ContainerAwareCommand
         return $this->filterWebsites($this->websiteRepository->findByTypes($types));
     }
 
+    /**
+     * @param Website[] $websites
+     * @return array
+     */
     protected function filterWebsites(array $websites)
     {
         $servers = $this->input->getOption('server');

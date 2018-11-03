@@ -21,13 +21,13 @@ class DetectCommand extends Command
         parent::configure();
         $this
             ->setName('app:website:detect')
-            ->setDescription('Detect type and version of all sites')
-            ->addOption('types', null, InputOption::VALUE_REQUIRED, 'Type of sites to process');
+            ->setDescription('Detect type and version of sites')
+            ->addOption('type', null, InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY, 'Type of sites to process');
     }
 
     protected function runCommand()
     {
-        $types = array_filter(preg_split('/\s*,\s*/', $this->input->getOption('types'), PREG_SPLIT_NO_EMPTY));
+        $types = $this->input->getOption('type');
         $websites = $types ? $this->getWebsitesByTypes($types) : $this->getWebsites();
 
         $detectors = [
@@ -86,7 +86,6 @@ class DetectCommand extends Command
                 $code = 0;
 
                 @exec($cmd, $output, $code);
-                // var_export(['cmd' => $cmd, 'output' => $output, 'code' => $code]);
                 if (0 === $code) {
                     $version = $detector['getVersion']($output, $website);
                     if (null !== $version) {

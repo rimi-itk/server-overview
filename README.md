@@ -1,9 +1,15 @@
 # server-overview
 
-Get a list of servers:
+Update server data:
+
+```sh
+bin/console app:server:data
+```
+
+Get websites on servers:
 
 ```
-bin/console app:website:update
+bin/console app:website:get
 ```
 
 Detect (guess) the type and version of each website:
@@ -16,6 +22,12 @@ Get data for each website:
 
 ```
 bin/console app:website:data
+```
+
+Get updates data for each website:
+
+```
+bin/console app:website:updates
 ```
 
 ## Deployment

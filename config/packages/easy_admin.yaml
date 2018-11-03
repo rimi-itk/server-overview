@@ -43,6 +43,7 @@ easy_admin:
              sortable: false
            - property: websites
            - property: enabled
+           - property: updatedAt
 
        show:
          fields:

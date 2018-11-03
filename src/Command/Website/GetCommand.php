@@ -13,14 +13,14 @@ namespace App\Command\Website;
 use App\Command\Command;
 use App\Entity\Website;
 
-class UpdateCommand extends Command
+class GetCommand extends Command
 {
     protected function configure()
     {
         parent::configure();
         $this
-            ->setName('app:website:update')
-            ->setDescription('Update list of sites');
+            ->setName('app:website:get')
+            ->setDescription('Get websites from servers');
     }
 
     protected function runCommand()
