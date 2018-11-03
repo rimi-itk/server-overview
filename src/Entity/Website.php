@@ -341,6 +341,7 @@ class Website
 
     public static function getValuesList()
     {
+        return [];
         $repository = Kernel::getContainerStatic()->get(WebsiteRepository::class);
         return $repository->getValuesList(...func_get_args());
     }
