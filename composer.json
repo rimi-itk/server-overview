@@ -106,10 +106,10 @@
         "symfony": {
             "allow-contrib": false
         },
-				"patches": {
-						"easycorp/easyadmin-bundle": {
-								"Make property protected": "patches/easycorp/easyadmin-bundle/query-builder.patch"
-						}
-				}
-		}
+        "patches": {
+            "easycorp/easyadmin-bundle": {
+                "Make property protected": "patches/easycorp/easyadmin-bundle/query-builder.patch"
+            }
+        }
+    }
 }

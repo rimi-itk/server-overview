@@ -23,6 +23,11 @@ class Kernel extends BaseKernel
 
     const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 
+    /**
+     * @var \Symfony\Component\DependencyInjection\Container
+     */
+    private static $_container;
+
     public function getCacheDir()
     {
         return $this->getProjectDir().'/var/cache/'.$this->environment;
@@ -42,11 +47,6 @@ class Kernel extends BaseKernel
             }
         }
     }
-
-    /**
-     * @var \Symfony\Component\DependencyInjection\Container
-     */
-    private static $_container;
 
     /**
      * @return \Symfony\Component\DependencyInjection\Container

@@ -10,18 +10,15 @@
 
 namespace App\Entity;
 
-
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Filter\RegexpFilter;
-
 use App\Kernel;
-
+use App\Repository\WebsiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
-use App\Repository\WebsiteRepository;
 
 /**
  * Website.
@@ -302,7 +299,6 @@ class Website
         return $this->comments;
     }
 
-
     public function getErrors(): ?string
     {
         return $this->errors;
@@ -343,6 +339,7 @@ class Website
     {
         return [];
         $repository = Kernel::getContainerStatic()->get(WebsiteRepository::class);
-        return $repository->getValuesList(...func_get_args());
+
+        return $repository->getValuesList(...\func_get_args());
     }
 }
