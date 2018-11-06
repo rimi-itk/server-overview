@@ -49,6 +49,7 @@ easy_admin:
            - property: websites
            - property: enabled
            - property: updatedAt
+           - property: createdAt
 
        show:
          fields:
