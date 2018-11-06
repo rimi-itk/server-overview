@@ -22,7 +22,7 @@ class DetectCommand extends Command
         $this
             ->setName('app:website:detect')
             ->setDescription('Detect type and version of sites')
-            ->addOption('type', null, InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY, 'Type of sites to process');
+            ->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Type of sites to process');
     }
 
     protected function runCommand()

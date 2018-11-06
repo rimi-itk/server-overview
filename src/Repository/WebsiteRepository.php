@@ -29,4 +29,22 @@ class WebsiteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getValuesList($type)
+    {
+        switch ($type) {
+            case 'type':
+                $result = $this->createQueryBuilder('w')
+                    ->select('type, count(*) as cardinality')
+                    ->groupBy('type')
+                    ->getQuery()
+                    ->getResult();
+                foreach ($result as $item) {
+                }
+
+                return ['drupal' => 'Drupal'];
+        }
+
+        return [];
+    }
 }

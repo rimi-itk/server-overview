@@ -26,3 +26,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Inject our custom search query builder
+    easyadmin.query_builder:
+      class: App\Search\QueryBuilder
+      arguments: ['@doctrine']
+      autowire: false
+      autoconfigure: false
+      public: true

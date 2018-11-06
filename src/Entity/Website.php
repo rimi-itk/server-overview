@@ -14,6 +14,8 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Filter\RegexpFilter;
+use App\Kernel;
+use App\Repository\WebsiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -331,5 +333,13 @@ class Website
         $this->siteRoot = $siteRoot;
 
         return $this;
+    }
+
+    public static function getValuesList()
+    {
+        return [];
+        $repository = Kernel::getContainerStatic()->get(WebsiteRepository::class);
+
+        return $repository->getValuesList(...\func_get_args());
     }
 }

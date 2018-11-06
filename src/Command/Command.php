@@ -113,6 +113,7 @@ abstract class Command extends ContainerAwareCommand
 
     /**
      * @param Website[] $websites
+     *
      * @return array
      */
     protected function filterWebsites(array $websites)
