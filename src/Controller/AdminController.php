@@ -10,8 +10,8 @@
 
 namespace App\Controller;
 
-use AlterPHP\EasyAdminExtensionBundle\Controller\AdminController as BaseAdminController;
+use AlterPHP\EasyAdminExtensionBundle\Controller\EasyAdminController;
 
-class AdminController extends BaseAdminController
+class AdminController extends EasyAdminController
 {
 }
