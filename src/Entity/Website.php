@@ -19,6 +19,7 @@ use App\Repository\WebsiteRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Website.
@@ -28,7 +29,8 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
  * @Gedmo\Loggable;
  * @ApiResource(
  *     collectionOperations={"get"},
- *     itemOperations={"get"}
+ *     itemOperations={"get"},
+ *     normalizationContext={"groups"={"read"}}
  * )
  * @ApiFilter(SearchFilter::class, properties={"domain", "server.name", "type", "version", "data"})
  * @ApiFilter(RegexpFilter::class, properties={"domain", "server.name", "type", "version", "data"})
@@ -50,12 +52,16 @@ class Website
      * @var string
      *
      * @ORM\Column(name="domain", type="string", length=255, nullable=false)
+     *
+     * @Groups("read")
      */
     private $domain;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Server", inversedBy="websites")
      * @ORM\JoinColumn(nullable=false)
+     *
+     * @Groups("read")
      */
     private $server;
 
@@ -63,6 +69,8 @@ class Website
      * @var string
      *
      * @ORM\Column(name="document_root", type="string", length=255, nullable=true)
+     *
+     * @Groups("read")
      */
     private $documentRoot;
 
@@ -70,6 +78,8 @@ class Website
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=255, nullable=true)
+     *
+     * @Groups("read")
      */
     private $type;
 
@@ -77,6 +87,8 @@ class Website
      * @var string
      *
      * @ORM\Column(name="version", type="string", length=255, nullable=true)
+     *
+     * @Groups("read")
      */
     private $version;
 

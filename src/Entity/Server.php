@@ -16,13 +16,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ServerRepository")
  * @UniqueEntity("name")
  * @ApiResource(
  *     collectionOperations={"get"},
- *     itemOperations={"get"}
+ *     itemOperations={"get"},
+ *     normalizationContext={"groups"={"read"}}
  * )
  */
 class Server
@@ -38,6 +40,8 @@ class Server
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
+     * @Groups("read")
      */
     private $name;
 
