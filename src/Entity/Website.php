@@ -121,6 +121,11 @@ class Website
      */
     private $siteRoot;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $search;
+
     public function __toString()
     {
         return json_encode([
@@ -353,5 +358,17 @@ class Website
         $repository = Kernel::getContainerStatic()->get(WebsiteRepository::class);
 
         return $repository->getValuesList(...\func_get_args());
+    }
+
+    public function getSearch(): ?string
+    {
+        return $this->search;
+    }
+
+    public function setSearch(?string $search): self
+    {
+        $this->search = $search;
+
+        return $this;
     }
 }

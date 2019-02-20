@@ -165,4 +165,10 @@ abstract class Command extends ContainerAwareCommand
         $args = \func_get_args();
         \call_user_func_array([$this->output, 'writeln'], $args);
     }
+
+    protected function write()
+    {
+        $args = \func_get_args();
+        \call_user_func_array([$this->output, 'write'], $args);
+    }
 }
