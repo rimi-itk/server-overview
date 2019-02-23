@@ -10,17 +10,17 @@
 
 namespace App\Command\Server;
 
-use App\Command\Command;
+use App\Command\AbstractCommand;
 use App\Entity\Server;
 
-class DataCommand extends Command
+class DataCommand extends AbstractCommand
 {
+    protected static $defaultName = 'app:server:data';
+
     protected function configure()
     {
         parent::configure();
-        $this
-            ->setName('app:server:data')
-            ->setDescription('Get data from all servers');
+        $this->setDescription('Get data from all servers');
     }
 
     protected function runCommand()

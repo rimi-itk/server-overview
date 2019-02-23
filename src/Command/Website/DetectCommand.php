@@ -10,17 +10,18 @@
 
 namespace App\Command\Website;
 
-use App\Command\Command;
+use App\Command\AbstractCommand;
 use App\Entity\Website;
 use Symfony\Component\Console\Input\InputOption;
 
-class DetectCommand extends Command
+class DetectCommand extends AbstractCommand
 {
+    protected static $defaultName = 'app:website:detect';
+
     protected function configure()
     {
         parent::configure();
         $this
-            ->setName('app:website:detect')
             ->setDescription('Detect type and version of sites')
             ->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Type of sites to process');
     }

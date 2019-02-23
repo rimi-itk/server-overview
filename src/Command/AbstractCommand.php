@@ -15,13 +15,13 @@ use App\Entity\Website;
 use App\Repository\ServerRepository;
 use App\Repository\WebsiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
-abstract class Command extends ContainerAwareCommand
+abstract class AbstractCommand extends Command
 {
     /**
      * @var InputInterface
@@ -36,7 +36,7 @@ abstract class Command extends ContainerAwareCommand
     /**
      * @var EntityManagerInterface
      */
-    protected $em;
+    protected $entityManager;
 
     /**
      * @var ServerRepository
@@ -48,9 +48,10 @@ abstract class Command extends ContainerAwareCommand
      */
     protected $websiteRepository;
 
-    public function __construct(ServerRepository $serverRepository, WebsiteRepository $websiteRepository)
+    public function __construct(EntityManagerInterface $entityManager, ServerRepository $serverRepository, WebsiteRepository $websiteRepository)
     {
         parent::__construct();
+        $this->entityManager = $entityManager;
         $this->serverRepository = $serverRepository;
         $this->websiteRepository = $websiteRepository;
     }
@@ -66,7 +67,6 @@ abstract class Command extends ContainerAwareCommand
     {
         $this->input = $input;
         $this->output = $output;
-        $this->em = $this->getContainer()->get('doctrine')->getEntityManager('default');
 
         if ((bool) $this->input->getOption('list-types')) {
             $types = [];
@@ -156,8 +156,8 @@ abstract class Command extends ContainerAwareCommand
 
     protected function persist($entity)
     {
-        $this->em->persist($entity);
-        $this->em->flush();
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
     }
 
     protected function writeln()

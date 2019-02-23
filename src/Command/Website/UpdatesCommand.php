@@ -10,17 +10,18 @@
 
 namespace App\Command\Website;
 
-use App\Command\Command;
+use App\Command\AbstractCommand;
 use App\Entity\Website;
 use Symfony\Component\Console\Input\InputOption;
 
-class UpdatesCommand extends Command
+class UpdatesCommand extends AbstractCommand
 {
+    protected static $defaultName = 'app:website:updates';
+
     protected function configure()
     {
         parent::configure();
         $this
-            ->setName('app:website:updates')
             ->setDescription('Get update data from sites')
             ->addOption('types', null, InputOption::VALUE_REQUIRED, 'Type of sites to process');
     }

@@ -10,17 +10,17 @@
 
 namespace App\Command\Website;
 
-use App\Command\Command;
+use App\Command\AbstractCommand;
 use App\Entity\Website;
 
-class GetCommand extends Command
+class GetCommand extends AbstractCommand
 {
+    protected static $defaultName = 'app:website:get';
+
     protected function configure()
     {
         parent::configure();
-        $this
-            ->setName('app:website:get')
-            ->setDescription('Get websites from servers');
+        $this->setDescription('Get websites from servers');
     }
 
     protected function runCommand()
@@ -30,9 +30,9 @@ class GetCommand extends Command
         foreach ($servers as $server) {
             $existing = $this->websiteRepository->findByServer($server);
             foreach ($existing as $existing) {
-                $this->em->remove($existing);
+                $this->entityManager->remove($existing);
             }
-            $this->em->flush();
+            $this->entityManager->flush();
 
             $this->writeln($server);
             $cmd = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$server->getName().' "for f in /etc/{apache,nginx}*/sites-enabled/*; do echo --- \$f; [ -e $f ] && grep --no-messages \'^[[:space:]]*\(server_name\|root\|Server\(Name\|Alias\)\|DocumentRoot\)\' \$f; done"';

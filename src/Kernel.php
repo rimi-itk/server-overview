@@ -23,45 +23,19 @@ class Kernel extends BaseKernel
 
     const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 
-    /**
-     * @var \Symfony\Component\DependencyInjection\Container
-     */
-    private static $_container;
-
-    public function getCacheDir()
-    {
-        return $this->getProjectDir().'/var/cache/'.$this->environment;
-    }
-
-    public function getLogDir()
-    {
-        return $this->getProjectDir().'/var/log';
-    }
-
     public function registerBundles()
     {
         $contents = require $this->getProjectDir().'/config/bundles.php';
         foreach ($contents as $class => $envs) {
-            if (isset($envs['all']) || isset($envs[$this->environment])) {
+            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
                 yield new $class();
             }
         }
     }
 
-    /**
-     * @return \Symfony\Component\DependencyInjection\Container
-     */
-    public static function getContainerStatic()
-    {
-        return self::$_container;
-    }
-
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
         $container->addResource(new FileResource($this->getProjectDir().'/config/bundles.php'));
-        // Feel free to remove the "container.autowiring.strict_mode" parameter
-        // if you are using symfony/dependency-injection 4.0+ as it's the default behavior
-        $container->setParameter('container.autowiring.strict_mode', true);
         $container->setParameter('container.dumper.inline_class_loader', true);
         $confDir = $this->getProjectDir().'/config';
 
@@ -69,8 +43,6 @@ class Kernel extends BaseKernel
         $loader->load($confDir.'/{packages}/'.$this->environment.'/**/*'.self::CONFIG_EXTS, 'glob');
         $loader->load($confDir.'/{services}'.self::CONFIG_EXTS, 'glob');
         $loader->load($confDir.'/{services}_'.$this->environment.self::CONFIG_EXTS, 'glob');
-
-        self::$_container = $container;
     }
 
     protected function configureRoutes(RouteCollectionBuilder $routes)

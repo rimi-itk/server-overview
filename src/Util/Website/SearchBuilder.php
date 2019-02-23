@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018 ITK Development
+ * (c) 2018–2019 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -63,7 +63,7 @@ class SearchBuilder
                             $moduleName = $matches['name'];
                             $modulesData[] = $moduleName.':'.$status;
                             if (isset($item['version'])) {
-                                $modulesData[] = $moduleName . ':' . $item['version'] . ':' . $status;
+                                $modulesData[] = $moduleName.':'.$item['version'].':'.$status;
                             }
                         }
                     }

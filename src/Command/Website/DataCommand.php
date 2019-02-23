@@ -10,17 +10,18 @@
 
 namespace App\Command\Website;
 
-use App\Command\Command;
+use App\Command\AbstractCommand;
 use App\Entity\Website;
 use Symfony\Component\Console\Input\InputOption;
 
-class DataCommand extends Command
+class DataCommand extends AbstractCommand
 {
+    protected static $defaultName = 'app:website:data';
+
     protected function configure()
     {
         parent::configure();
         $this
-            ->setName('app:website:data')
             ->setDescription('Get data from sites')
             ->addOption('types', null, InputOption::VALUE_REQUIRED, 'Type of sites to process');
     }
