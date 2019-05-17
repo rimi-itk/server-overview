@@ -10,6 +10,9 @@ easy_admin:
                 # For collapsible form filters to work, a full version should be added:
                 - 'bundles/easyadmin/bootstrap-all.js'
 
+    formats:
+        datetime: 'd/m/Y H:i:s'
+
     entities:
          Website:
              class: App\Entity\Website
@@ -37,6 +40,7 @@ easy_admin:
              show:
                  fields:
                      - property: domain
+                       template: easy_admin/Website/domain.html.twig
                      - property: server
                      - property: documentRoot
                      - property: type
@@ -53,6 +57,7 @@ easy_admin:
                  max_results: 50
                  fields:
                      - property: name
+                       template: easy_admin/Server/name.html.twig
                      - property: data
                        template: easy_admin/Server/data.html.twig
                        sortable: false
@@ -64,6 +69,7 @@ easy_admin:
              show:
                  fields:
                      - property: name
+                       template: easy_admin/Server/name.html.twig
                      - property: enabled
                      - property: data
                        template: easy_admin/Server/data.html.twig

@@ -11,6 +11,7 @@
 namespace App\Command\Website;
 
 use App\Command\AbstractCommand;
+use App\Command\Website\Util\AbstractDetector;
 use App\Entity\Website;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -31,100 +32,118 @@ class DetectCommand extends AbstractCommand
         $types = $this->input->getOption('type');
         $websites = $types ? $this->getWebsitesByTypes($types) : $this->getWebsites();
 
-        $detectors = [
-            'drupal (multisite)' => [
-                'getCommand' => function (Website $website) {
-                    $siteDirectory = 'sites/'.$website->getDomain();
-
-                    return "[ -e $siteDirectory ] && cd $siteDirectory && hash drush 2>/dev/null && drush status --format=json";
-                },
-                'getVersion' => function (array $output) {
-                    $data = json_decode(implode('', $output), true);
-
-                    return isset($data['drupal-version']) ? $data['drupal-version'] : null;
-                },
-            ],
-            'drupal' => [
-                'command' => 'hash drush 2>/dev/null && drush status --format=json',
-                'getVersion' => function (array $output) {
-                    $data = json_decode(implode('', $output), true);
-
-                    return isset($data['drupal-version']) ? $data['drupal-version'] : null;
-                },
-            ],
-            'symfony 4' => [
-                'command' => '[ -e ../bin/console ] && APP_ENV=prod ../bin/console --version 2>/dev/null',
-                'getVersion' => function (array $output) {
-                    return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output[0], $matches) ? $matches['version'] : null;
-                },
-                'type' => 'symfony',
-            ],
-            'symfony 3' => [
-                'command' => '[ -e ../bin/console ] && ../bin/console --env=prod --version 2>/dev/null',
-                'getVersion' => function (array $output) {
-                    return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output[0], $matches) ? $matches['version'] : null;
-                },
-                'type' => 'symfony',
-            ],
-            'symfony 2' => [
-                'command' => '[ -e ../app/console ] && ../app/console --env=prod --version 2>/dev/null',
-                'getVersion' => function (array $output) {
-                    return preg_match('/version\s+(?<version>[^\s]+)/i', $output[0], $matches) ? $matches['version'] : null;
-                },
-                'type' => 'symfony',
-            ],
-            'unknown' => [
-                'command' => 'true',
-                'getVersion' => function (array $output) {
-                    return 0;
-                },
-            ],
-        ];
+        $detectors = $this->getDetectors();
 
         foreach ($websites as $website) {
             $this->notice(sprintf('%-40s%-40s', $website->getServerName(), $website->getDomain()));
-            $type = null;
-            $version = null;
 
-            if (filter_var($website->getDocumentRoot(), FILTER_VALIDATE_URL)) {
-                $type = 'proxy';
-                $version = '👻';
-            } else {
-                $cmdTemplate = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$website->getServer()
-                                     .' "cd '.$website->getDocumentRoot().' && {{ command }}"';
+            foreach ($detectors as $detector) {
+                $command = 'cd '.$website->getDocumentRoot().' && '.$detector->getCommand($website);
+                $output = $this->runOnServer($website->getServer(), $command);
 
-                foreach ($detectors as $type => $detector) {
-                    $command = isset($detector['getCommand']) ? $detector['getCommand']($website) : $detector['command'];
-                    $cmd = str_replace('{{ command }}', $command, $cmdTemplate);
+                $version = $detector->getVersion($output, $website);
+                if (null !== $version) {
+                    $website
+                        ->setType($detector->getType())
+                        ->setVersion($version);
+                    $this->persist($website);
 
-                    $output = null;
-                    $code = 0;
+                    $this->info(sprintf(
+                        '%-40s%-40s',
+                        $website->getType(),
+                        $website->getVersion()
+                    ));
 
-                    @exec($cmd, $output, $code);
-
-                    if (0 === $code) {
-                        $version = $detector['getVersion']($output, $website);
-                        if (null !== $version) {
-                            $type = $detector['type'] ?? $type;
-
-                            break;
-                        }
-                    }
+                    break;
                 }
             }
-
-            if (null !== $type) {
-                $website
-                    ->setType($type)
-                    ->setVersion($version);
-                $this->persist($website);
-            }
-
-            $this->info(sprintf(
-                '%-40s%-40s',
-                $website->getType(),
-                $website->getVersion()
-            ));
         }
+    }
+
+    /**
+     * @return AbstractDetector[]
+     */
+    private function getDetectors()
+    {
+        return [
+            // Proxy
+            new class(Website::TYPE_PROXY) extends AbstractDetector {
+                protected $command = 'true';
+
+                public function getVersion(string $output, Website $website)
+                {
+                    return filter_var($website->getDocumentRoot(), FILTER_VALIDATE_URL) ? Website::TYPE_UNKNOWN : null;
+                }
+            },
+
+            // Drupal (multisite)
+            new class(Website::TYPE_DRUPAL_MULTISITE) extends AbstractDetector {
+                public function getCommand(Website $website)
+                {
+                    $siteDirectory = 'sites/'.$website->getDomain();
+
+                    return "[ -e $siteDirectory ] && cd $siteDirectory && hash drush 2>/dev/null && drush status --format=json";
+                }
+
+                public function getVersion(string $output, Website $website)
+                {
+                    $data = json_decode($output, true);
+
+                    return $data['drupal-version'] ?? null;
+                }
+            },
+
+            // Drupal
+            new class(Website::TYPE_DRUPAL) extends AbstractDetector {
+                protected $command = 'hash drush 2>/dev/null && drush status --format=json';
+
+                public function getVersion(string $output, Website $website)
+                {
+                    $data = json_decode($output, true);
+
+                    return $data['drupal-version'] ?? null;
+                }
+            },
+
+            // Symfony 4
+            new class(Website::TYPE_SYMFONY) extends AbstractDetector {
+                protected $command = '[ -e ../bin/console ] && APP_ENV=prod ../bin/console --version 2>/dev/null';
+
+                public function getVersion(string $output, Website $website)
+                {
+                    return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output, $matches) ? $matches['version'] : null;
+                }
+            },
+
+            // Symfony 3
+            new class(Website::TYPE_SYMFONY) extends AbstractDetector {
+                protected $command = '[ -e ../bin/console ] && ../bin/console --env=prod --version 2>/dev/null';
+
+                public function getVersion(string $output, Website $website)
+                {
+                    return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output, $matches) ? $matches['version'] : null;
+                }
+            },
+
+            // Symfony 2
+            new class(Website::TYPE_SYMFONY) extends AbstractDetector {
+                protected $command = '[ -e ../app/console ] && ../app/console --env=prod --version 2>/dev/null';
+
+                public function getVersion(string $output, Website $website)
+                {
+                    return preg_match('/version\s+(?<version>[^\s]+)/i', $output, $matches) ? $matches['version'] : null;
+                }
+            },
+
+            // Unknown
+            new class(Website::TYPE_UNKNOWN) extends AbstractDetector {
+                protected $command = 'true';
+
+                public function getVersion(string $output, Website $website)
+                {
+                    return Website::TYPE_UNKNOWN;
+                }
+            },
+        ];
     }
 }

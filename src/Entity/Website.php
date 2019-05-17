@@ -38,6 +38,12 @@ class Website implements \JsonSerializable
 {
     use TimestampableEntity;
 
+    public const TYPE_DRUPAL = 'drupal';
+    public const TYPE_DRUPAL_MULTISITE = 'drupal (multisite)';
+    public const TYPE_PROXY = 'proxy';
+    public const TYPE_SYMFONY = 'symfony';
+    public const TYPE_UNKNOWN = '👻';
+
     /**
      * @var int
      *
