@@ -1,65 +1,75 @@
 easy_admin:
-  site_name: 'ITK sites'
+    site_name: 'ITK sites'
 
-  entities:
-     Website:
-       class: App\Entity\Website
-       disabled_actions: ['new', 'edit', 'delete']
-       list:
-         actions: ['show']
-         max_results: 300
-         form_filters:
-           # - property: server
-           - property: type
-             type_options:
-               choices_static_callback: [getValuesList, [type]]
-         fields:
-           - property: domain
-             template: easy_admin/Website/domain.html.twig
-           - property: server
-           - property: documentRoot
-           - property: type
-           - property: version
-           - property: data
-             template: easy_admin/Website/data.html.twig
-           - property: updatedAt
+    design:
+        assets:
+            css:
+                - 'bundles/easyadmin/bootstrap-all.css'
+            js:
+                # By default, EasyAdminBundle embeds a limited version of Bootstrap JS.
+                # For collapsible form filters to work, a full version should be added:
+                - 'bundles/easyadmin/bootstrap-all.js'
 
-       show:
-         fields:
-           - property: domain
-           - property: server
-           - property: documentRoot
-           - property: type
-           - property: version
-           - property: data
-             template: easy_admin/Website/data.html.twig
-           - property: updatedAt
+    entities:
+         Website:
+             class: App\Entity\Website
+             disabled_actions: ['new', 'edit', 'delete']
+             list:
+                 actions: ['show']
+                 max_results: 300
+                 # form_filters:
+                 #     - property: server
+                 #     - property: type
+                 #       type_options:
+                 #           choices_static_callback: [getValuesList, [type]]
 
-     Server:
-       class: App\Entity\Server
-       disabled_actions: ['delete']
-       list:
-         actions: ['show']
-         max_results: 50
-         fields:
-           - property: name
-           - property: data
-             template: easy_admin/Server/data.html.twig
-             sortable: false
-           - property: websites
-           - property: enabled
-           - property: updatedAt
-           - property: createdAt
+                 fields:
+                     - property: domain
+                       template: easy_admin/Website/domain.html.twig
+                     - property: server
+                     - property: documentRoot
+                     - property: type
+                     - property: version
+                     - property: data
+                       template: easy_admin/Website/data.html.twig
+                     - property: updatedAt
 
-       show:
-         fields:
-           - property: name
-           - property: enabled
-           - property: data
-             template: easy_admin/Server/data.html.twig
-           - property: websites
+             show:
+                 fields:
+                     - property: domain
+                     - property: server
+                     - property: documentRoot
+                     - property: type
+                     - property: version
+                     - property: data
+                       template: easy_admin/Website/data.html.twig
+                     - property: updatedAt
 
-       form:
-         fields:
-           - property: name
-           - property: enabled
+         Server:
+             class: App\Entity\Server
+             disabled_actions: ['delete']
+             list:
+                 actions: ['show']
+                 max_results: 50
+                 fields:
+                     - property: name
+                     - property: data
+                       template: easy_admin/Server/data.html.twig
+                       sortable: false
+                     - property: websites
+                     - property: enabled
+                     - property: updatedAt
+                     - property: createdAt
+
+             show:
+                 fields:
+                     - property: name
+                     - property: enabled
+                     - property: data
+                       template: easy_admin/Server/data.html.twig
+                     - property: websites
+
+             form:
+                 fields:
+                     - property: name
+                     - property: enabled

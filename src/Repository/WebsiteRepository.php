@@ -12,11 +12,12 @@ namespace App\Repository;
 
 use App\Entity\Website;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class WebsiteRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(RegistryInterface $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Website::class);
     }
@@ -30,21 +31,8 @@ class WebsiteRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getValuesList($type)
+    public static function getValuesList($property)
     {
-        switch ($type) {
-            case 'type':
-                $result = $this->createQueryBuilder('w')
-                    ->select('type, count(*) as cardinality')
-                    ->groupBy('type')
-                    ->getQuery()
-                    ->getResult();
-                foreach ($result as $item) {
-                }
-
-                return ['drupal' => 'Drupal'];
-        }
-
         return [];
     }
 }
