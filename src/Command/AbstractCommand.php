@@ -15,9 +15,11 @@ use App\Entity\Website;
 use App\Repository\ServerRepository;
 use App\Repository\WebsiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
@@ -32,6 +34,9 @@ abstract class AbstractCommand extends Command
      * @var OutputInterface
      */
     protected $output;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * @var EntityManagerInterface
@@ -67,6 +72,7 @@ abstract class AbstractCommand extends Command
     {
         $this->input = $input;
         $this->output = $output;
+        $this->logger = new ConsoleLogger($this->output);
 
         if ((bool) $this->input->getOption('list-types')) {
             $types = [];

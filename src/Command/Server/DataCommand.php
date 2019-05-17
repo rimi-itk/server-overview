@@ -25,7 +25,7 @@ class DataCommand extends AbstractCommand
 
     protected function runCommand()
     {
-        $servers = $this->serverRepository->findEnabled();
+        $servers = $this->getServers();
 
         foreach ($servers as $server) {
             $this->output->writeln($server);
