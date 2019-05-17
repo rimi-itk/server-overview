@@ -75,11 +75,9 @@ class UpdatesCommand extends AbstractCommand
         ];
 
         foreach ($websites as $website) {
-            $this->output->writeln($website);
+            $this->notice($website->getDomain());
 
             if (isset($detectors[$website->getType()])) {
-                $this->output->writeln("\t".$website->getType());
-
                 $detector = $detectors[$website->getType()];
 
                 $cmdTemplate = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$website->getServer()

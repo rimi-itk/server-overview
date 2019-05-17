@@ -83,11 +83,9 @@ class DataCommand extends AbstractCommand
         ];
 
         foreach ($websites as $website) {
-            $this->output->writeln($website);
+            $this->notice($website->getDomain());
 
             if (isset($detectors[$website->getType()])) {
-                $this->output->writeln("\t".$website->getType());
-
                 $detector = $detectors[$website->getType()];
 
                 $cmdTemplate = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$website->getServer()
@@ -102,6 +100,7 @@ class DataCommand extends AbstractCommand
                 @exec($cmd, $output, $code);
                 if (0 === $code) {
                     $data = $detector['getData']($output, $website);
+                    $this->debug($data);
                     if (null !== $data) {
                         $website->setData($data);
                         $this->persist($website);

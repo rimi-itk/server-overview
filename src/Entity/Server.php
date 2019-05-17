@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     normalizationContext={"groups"={"read"}}
  * )
  */
-class Server
+class Server implements \JsonSerializable
 {
     use TimestampableEntity;
 
@@ -140,5 +140,12 @@ class Server
         $this->enabled = $enabled;
 
         return $this;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'name' => $this->getName(),
+        ];
     }
 }

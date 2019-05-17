@@ -16,6 +16,7 @@ use App\Repository\ServerRepository;
 use App\Repository\WebsiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,6 +26,8 @@ use Symfony\Component\Process\Process;
 
 abstract class AbstractCommand extends Command
 {
+    use LoggerTrait;
+
     /**
      * @var InputInterface
      */
@@ -34,9 +37,6 @@ abstract class AbstractCommand extends Command
      * @var OutputInterface
      */
     protected $output;
-
-    /** @var LoggerInterface */
-    protected $logger;
 
     /**
      * @var EntityManagerInterface
@@ -53,12 +53,24 @@ abstract class AbstractCommand extends Command
      */
     protected $websiteRepository;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     public function __construct(EntityManagerInterface $entityManager, ServerRepository $serverRepository, WebsiteRepository $websiteRepository)
     {
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->serverRepository = $serverRepository;
         $this->websiteRepository = $websiteRepository;
+    }
+
+    public function log($level, $message, array $context = [])
+    {
+        if (!is_scalar($message)) {
+            $message = json_encode($message, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+
+        $this->logger->log($level, $message, $context);
     }
 
     protected function configure()
@@ -97,12 +109,16 @@ abstract class AbstractCommand extends Command
 
     protected function runOnServer(Server $server, $command)
     {
-        $sshArguments = '-o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A';
-        $host = 'deploy@'.$server->getName();
-
-        $ssh = "ssh $sshArguments $host '$command'";
-        $process = new Process($ssh);
-        $process->mustRun();
+        $process = new Process([
+            'ssh',
+            '-o ConnectTimeout=10',
+            '-o BatchMode=yes',
+            '-o StrictHostKeyChecking=no',
+            '-A',
+            'deploy@'.$server->getName(),
+            $command,
+        ]);
+        $process->run();
 
         return $process->getOutput();
     }
@@ -208,18 +224,6 @@ abstract class AbstractCommand extends Command
     {
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
-    }
-
-    protected function writeln()
-    {
-        $args = \func_get_args();
-        \call_user_func_array([$this->output, 'writeln'], $args);
-    }
-
-    protected function write()
-    {
-        $args = \func_get_args();
-        \call_user_func_array([$this->output, 'write'], $args);
     }
 
     protected function debug()

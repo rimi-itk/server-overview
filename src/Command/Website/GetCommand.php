@@ -28,13 +28,14 @@ class GetCommand extends AbstractCommand
         $servers = $this->getServers();
 
         foreach ($servers as $server) {
+            $this->notice($server->getName());
+
             $existing = $this->websiteRepository->findByServer($server);
             foreach ($existing as $existing) {
                 $this->entityManager->remove($existing);
             }
             $this->entityManager->flush();
 
-            $this->writeln($server);
             $cmd = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$server->getName().' "for f in /etc/{apache,nginx}*/sites-enabled/*; do echo --- \$f; [ -e $f ] && grep --no-messages \'^[[:space:]]*\(server_name\|root\|proxy_pass\|Server\(Name\|Alias\)\|DocumentRoot\)\' \$f; done"';
 
             $lines = [];
@@ -82,7 +83,7 @@ class GetCommand extends AbstractCommand
                                             ->setServer($server)
                                             ->setDocumentRoot($documentRoot);
 
-                                        $this->writeln('  '.$website);
+                                        $this->info('  '.$website->getDomain());
 
                                         $this->persist($website);
                                     }
@@ -93,7 +94,6 @@ class GetCommand extends AbstractCommand
                     }
                 }
             }
-            $this->writeln('');
         }
     }
 }

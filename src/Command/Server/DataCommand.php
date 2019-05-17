@@ -28,7 +28,7 @@ class DataCommand extends AbstractCommand
         $servers = $this->getServers();
 
         foreach ($servers as $server) {
-            $this->output->writeln($server);
+            $this->notice($server->getName());
 
             $data = [];
 
@@ -56,6 +56,8 @@ class DataCommand extends AbstractCommand
                 $this->showException($e, $server);
             }
 
+            $this->debug($data);
+
             $server->setData($data);
             $this->persist($server);
         }
@@ -63,14 +65,7 @@ class DataCommand extends AbstractCommand
 
     private function showException(\Exception $e, Server $server)
     {
-        if ($this->input->getOption('verbose')) {
-            $this->writeln([
-                str_repeat('-', 80),
-                $server,
-                $e->getMessage(),
-                str_repeat('-', 80),
-            ]);
-        }
+        $this->error($server->getName().': '.$e->getMessage(), ['exception' => $e]);
     }
 
     private function getPHPData(Server $server)
@@ -101,7 +96,7 @@ class DataCommand extends AbstractCommand
 
     private function getNginxData(Server $server)
     {
-        $cmd = 'nginx -v 2>&1';
+        $cmd = 'nginx';
         $output = $this->runOnServer($server, $cmd);
         $data = ['output' => $output];
 
@@ -118,7 +113,7 @@ class DataCommand extends AbstractCommand
         $output = $this->runOnServer($server, $cmd);
         $data = ['output' => $output];
 
-        if (preg_match('@(?P<version>[0-9]+(?:\.[0-9]+){2})@', $output, $matches)) {
+        if (preg_match('@(?P<version>[0-9]+(?:\.[0-9]+){2}(?:-[a-z]+)?)@i', $output, $matches)) {
             $data['version'] = $matches['version'];
         }
 

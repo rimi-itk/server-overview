@@ -40,9 +40,9 @@ class SearchRebuildCommand extends AbstractCommand
         $websites = $this->getWebsites();
 
         foreach ($websites as $website) {
-            $this->write($website->getDomain());
+            $this->info($website->getDomain());
             $this->searchRebuilder->build($website);
-            $this->writeln(' done.');
+            $this->info(' done.');
         }
     }
 }

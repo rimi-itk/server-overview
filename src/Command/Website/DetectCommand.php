@@ -57,12 +57,14 @@ class DetectCommand extends AbstractCommand
                 'getVersion' => function (array $output) {
                     return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output[0], $matches) ? $matches['version'] : null;
                 },
+                'type' => 'symfony',
             ],
             'symfony 3' => [
                 'command' => '[ -e ../bin/console ] && ../bin/console --env=prod --version 2>/dev/null',
                 'getVersion' => function (array $output) {
                     return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output[0], $matches) ? $matches['version'] : null;
                 },
+                'type' => 'symfony',
             ],
             'symfony 2' => [
                 'command' => '[ -e ../app/console ] && ../app/console --env=prod --version 2>/dev/null',
@@ -80,40 +82,49 @@ class DetectCommand extends AbstractCommand
         ];
 
         foreach ($websites as $website) {
-            $this->output->writeln($website->getDomain());
+            $this->notice(sprintf('%-40s%-40s', $website->getServerName(), $website->getDomain()));
+            $type = null;
+            $version = null;
 
             if (filter_var($website->getDocumentRoot(), FILTER_VALIDATE_URL)) {
-                $website->setType('proxy')->setVersion('👻');
-                $this->persist($website);
-
-                continue;
-            }
-
-            $cmdTemplate = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$website->getServer()
+                $type = 'proxy';
+                $version = '👻';
+            } else {
+                $cmdTemplate = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$website->getServer()
                                      .' "cd '.$website->getDocumentRoot().' && {{ command }}"';
 
-            foreach ($detectors as $type => $detector) {
-                $command = isset($detector['getCommand']) ? $detector['getCommand']($website) : $detector['command'];
-                $cmd = str_replace('{{ command }}', $command, $cmdTemplate);
+                foreach ($detectors as $type => $detector) {
+                    $command = isset($detector['getCommand']) ? $detector['getCommand']($website) : $detector['command'];
+                    $cmd = str_replace('{{ command }}', $command, $cmdTemplate);
 
-                $output = null;
-                $code = 0;
+                    $output = null;
+                    $code = 0;
 
-                @exec($cmd, $output, $code);
-                if (0 === $code) {
-                    $version = $detector['getVersion']($output, $website);
-                    if (null !== $version) {
-                        $website
-                            ->setType(isset($detector['type']) ? $detector['type'] : $type)
-                            ->setVersion($version);
-                        $this->persist($website);
+                    @exec($cmd, $output, $code);
 
-                        $this->output->writeln(implode("\t", [$website->getDomain(), $website->getType(), $website->getVersion()]));
+                    if (0 === $code) {
+                        $version = $detector['getVersion']($output, $website);
+                        if (null !== $version) {
+                            $type = $detector['type'] ?? $type;
 
-                        break;
+                            break;
+                        }
                     }
                 }
             }
+
+            if (null !== $type) {
+                $website
+                    ->setType($type)
+                    ->setVersion($version);
+                $this->persist($website);
+            }
+
+            $this->info(sprintf(
+                '%-40s%-40s',
+                $website->getType(),
+                $website->getVersion()
+            ));
         }
     }
 }
