@@ -52,7 +52,13 @@ class DetectCommand extends AbstractCommand
                     return isset($data['drupal-version']) ? $data['drupal-version'] : null;
                 },
             ],
-            'symfony' => [
+            'symfony 4' => [
+                'command' => '[ -e ../bin/console ] && APP_ENV=prod ../bin/console --version 2>/dev/null',
+                'getVersion' => function (array $output) {
+                    return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output[0], $matches) ? $matches['version'] : null;
+                },
+            ],
+            'symfony 3' => [
                 'command' => '[ -e ../bin/console ] && ../bin/console --env=prod --version 2>/dev/null',
                 'getVersion' => function (array $output) {
                     return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output[0], $matches) ? $matches['version'] : null;
