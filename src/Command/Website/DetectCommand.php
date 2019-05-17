@@ -76,6 +76,13 @@ class DetectCommand extends AbstractCommand
         foreach ($websites as $website) {
             $this->output->writeln($website->getDomain());
 
+            if (filter_var($website->getDocumentRoot(), FILTER_VALIDATE_URL)) {
+                $website->setType('proxy')->setVersion('👻');
+                $this->persist($website);
+
+                continue;
+            }
+
             $cmdTemplate = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$website->getServer()
                                      .' "cd '.$website->getDocumentRoot().' && {{ command }}"';
 

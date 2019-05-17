@@ -25,7 +25,7 @@ class GetCommand extends AbstractCommand
 
     protected function runCommand()
     {
-        $servers = $this->serverRepository->findEnabled();
+        $servers = $this->getServers();
 
         foreach ($servers as $server) {
             $existing = $this->websiteRepository->findByServer($server);
@@ -35,16 +35,14 @@ class GetCommand extends AbstractCommand
             $this->entityManager->flush();
 
             $this->writeln($server);
-            $cmd = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$server->getName().' "for f in /etc/{apache,nginx}*/sites-enabled/*; do echo --- \$f; [ -e $f ] && grep --no-messages \'^[[:space:]]*\(server_name\|root\|Server\(Name\|Alias\)\|DocumentRoot\)\' \$f; done"';
+            $cmd = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$server->getName().' "for f in /etc/{apache,nginx}*/sites-enabled/*; do echo --- \$f; [ -e $f ] && grep --no-messages \'^[[:space:]]*\(server_name\|root\|proxy_pass\|Server\(Name\|Alias\)\|DocumentRoot\)\' \$f; done"';
 
             $lines = [];
             $code = 0;
             exec($cmd, $lines, $code);
 
             if (!empty($lines)) {
-                $lines = array_map(function ($line) {
-                    return trim($line);
-                }, $lines);
+                $lines = array_map('trim', $lines);
                 $indexes = [];
                 foreach ($lines as $index => $line) {
                     if (preg_match('/^---/', $line)) {
@@ -67,7 +65,7 @@ class GetCommand extends AbstractCommand
                                     $domains = [];
                                 }
                                 $domains = array_merge($domains, preg_split('/\s+/', trim($matches[1], ';'), -1, PREG_SPLIT_NO_EMPTY));
-                            } elseif (preg_match('/^(?:root|DocumentRoot)\s+(.+)/', $line, $matches)) {
+                            } elseif (preg_match('/^(?:root|DocumentRoot|proxy_pass)\s+(.+)/', $line, $matches)) {
                                 if ($domains) {
                                     $domains = array_unique(array_map(function ($domain) {
                                         return preg_replace('/^www\./', '', $domain);
