@@ -111,8 +111,11 @@ abstract class AbstractCommand extends Command
         $query += [
             'enabled' => true,
         ];
+        $orderBy = [
+            'name' => 'ASC',
+        ];
 
-        return $this->filterServers($this->serverRepository->findBy($query));
+        return $this->filterServers($this->serverRepository->findBy($query, $orderBy));
     }
 
     /**
