@@ -12,36 +12,35 @@ namespace App\Command\Website\Util;
 
 use App\Entity\Website;
 
-abstract class AbstractDetector
+abstract class AbstractDataProvider
 {
     /**
-     * Website type. On of the Website::TYPE_* constants.
-     *
      * @var string
      */
-    protected $type;
+    protected $key;
 
     /**
      * @var string
      */
     protected $command;
 
-    /**
-     * AbstractDetector constructor.
-     *
-     * @param string $type
-     */
-    public function __construct(string $type)
+    public function __construct()
     {
-        $this->type = $type;
+        if (null === $this->key) {
+            throw new \RuntimeException('key is not defined in '.static::class);
+        }
     }
 
     /**
-     * @return string
+     * @param Website $website
+     *
+     * @return bool
      */
-    public function getType()
+    abstract public function canHandle(Website $website);
+
+    public function getKey()
     {
-        return $this->type;
+        return $this->key;
     }
 
     /**
@@ -62,7 +61,7 @@ abstract class AbstractDetector
      * @param string  $output
      * @param Website $website
      *
-     * @return string
+     * @return null|array
      */
-    abstract public function getVersion(string $output, Website $website);
+    abstract public function getData(string $output, Website $website);
 }

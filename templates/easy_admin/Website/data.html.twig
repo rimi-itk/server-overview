@@ -1,9 +1,15 @@
 {% if view == 'list' %}
 	{{ value ? '…' : '–' }}
 {% elseif view == 'show' %}
-	{% set data = value|json_decode %}
+	{% set data = value %}
+
 	<div class="website-data" style="max-height: 32em; overflow: auto;">
-		{% if item.type matches '/^drupal/' %}
+
+        {% if data is null %}
+
+            {{ '–' }}
+
+		{% elseif data.drupal|default(false) %}
 
 			<table class="table table-sm table-hover">
 				<thead>
@@ -13,7 +19,8 @@
 					<th>Status</th>
 					<th>Version</th>
 				</thead>
-				{% for status, items in data %}
+
+				{% for status, items in data.drupal %}
 					<tbody>
 						{% for item in items %}
 							<tr>
@@ -26,9 +33,10 @@
 						{% endfor %}
 					</tbody>
 				{% endfor %}
+
 			</table>
 
-		{% elseif item.type matches '/^symfony/' %}
+		{% elseif data.symfony|default(false) %}
 
 			<table class="table table-sm table-hover">
 				<thead>
@@ -36,7 +44,7 @@
 					<th>Version</th>
 					<th>Description</th>
 				</thead>
-				{% for status, items in data %}
+				{% for status, items in data.symfony %}
 					<tbody>
 						{% for item in items %}
 							<tr>
@@ -49,7 +57,11 @@
 				{% endfor %}
 			</table>
 		{% else %}
+
 			{{ data|json_encode(constant('JSON_PRETTY_PRINT')) }}
-		{% endif %}
+
+        {% endif %}
+
 	</div>
+
 {% endif %}

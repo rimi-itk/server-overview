@@ -1,0 +1,12 @@
+{% if item.data.git|default(false) %}
+    {% for chunk in item.data.git %}
+        {% if not loop.first %}
+            <hr/>
+        {% endif %}
+        <pre>path:   {{ chunk.path }}
+branch: <a href="{{ chunk.remote }}/tree/{{ chunk.branch }}">{{ chunk.branch }}</a>
+commit: <a href="{{ chunk.remote }}/commit/{{ chunk.commit }}">{{ chunk.commit }}</a></pre>
+    {% endfor %}
+{% else %}
+    {{ '–' }}
+{% endif %}

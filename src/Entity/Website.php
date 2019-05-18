@@ -42,8 +42,8 @@ class Website implements \JsonSerializable
     public const TYPE_DRUPAL_MULTISITE = 'drupal (multisite)';
     public const TYPE_PROXY = 'proxy';
     public const TYPE_SYMFONY = 'symfony';
-    public const TYPE_UNKNOWN = '👻';
-
+    public const TYPE_UNKNOWN = '🐼'; // Panda face
+    public const VERSION_UNKNOWN = '👻'; // Ghost
     /**
      * @var int
      *
@@ -98,9 +98,9 @@ class Website implements \JsonSerializable
     private $version;
 
     /**
-     * @var string
+     * @var array
      *
-     * @ORM\Column(name="data", type="text", nullable=true)
+     * @ORM\Column(name="data", type="json_array", nullable=true)
      */
     private $data;
 
@@ -228,6 +228,19 @@ class Website implements \JsonSerializable
         return $this->documentRoot;
     }
 
+    public function getProjectDir()
+    {
+        if (self::TYPE_SYMFONY === $this->getType()) {
+//            header('Content-type: text/plain'); echo var_export([
+//                $this->getDocumentRoot(),
+//                dirname($this->getDocumentRoot()),
+//            ], true); die(__FILE__.':'.__LINE__.':'.__METHOD__);
+            return \dirname($this->getDocumentRoot());
+        }
+
+        return $this->getDocumentRoot();
+    }
+
     /**
      * Set type.
      *
@@ -279,11 +292,11 @@ class Website implements \JsonSerializable
     /**
      * Set data.
      *
-     * @param string $data
+     * @param null|array $data
      *
      * @return Website
      */
-    public function setData($data)
+    public function setData(array $data = null)
     {
         $this->data = $data;
 
@@ -293,11 +306,16 @@ class Website implements \JsonSerializable
     /**
      * Get data.
      *
-     * @return string
+     * @return null|array
      */
     public function getData()
     {
-        return $this->data;
+        return $this->data ?? [];
+    }
+
+    public function addData(array $data)
+    {
+        return $this->setData(array_merge($this->getData(), $data));
     }
 
     /**

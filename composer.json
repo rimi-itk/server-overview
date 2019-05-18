@@ -34,7 +34,8 @@
         "symfony/webpack-encore-bundle": "^1.1",
         "symfony/yaml": "4.2.*",
         "twig/extensions": "^1.5",
-        "webonyx/graphql-php": "^0.12.6"
+        "webonyx/graphql-php": "^0.12.6",
+        "ext-json": "*"
     },
     "require-dev": {
         "deployer/deployer": "^6.2",

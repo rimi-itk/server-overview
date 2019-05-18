@@ -45,6 +45,8 @@ easy_admin:
                      - property: documentRoot
                      - property: type
                      - property: version
+                     - property: git
+                       template: easy_admin/Website/data/git.html.twig
                      - property: data
                        template: easy_admin/Website/data.html.twig
                      - property: updatedAt
@@ -55,6 +57,7 @@ easy_admin:
              list:
                  actions: ['show']
                  max_results: 50
+                 sort: [name, ASC]
                  fields:
                      - property: name
                        template: easy_admin/Server/name.html.twig

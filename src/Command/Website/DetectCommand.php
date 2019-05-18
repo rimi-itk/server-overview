@@ -72,7 +72,7 @@ class DetectCommand extends AbstractCommand
 
                 public function getVersion(string $output, Website $website)
                 {
-                    return filter_var($website->getDocumentRoot(), FILTER_VALIDATE_URL) ? Website::TYPE_UNKNOWN : null;
+                    return filter_var($website->getDocumentRoot(), FILTER_VALIDATE_URL) ? Website::VERSION_UNKNOWN : null;
                 }
             },
 
@@ -141,7 +141,7 @@ class DetectCommand extends AbstractCommand
 
                 public function getVersion(string $output, Website $website)
                 {
-                    return Website::TYPE_UNKNOWN;
+                    return Website::VERSION_UNKNOWN;
                 }
             },
         ];
