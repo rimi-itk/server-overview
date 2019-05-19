@@ -34,7 +34,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ApiFilter(SearchFilter::class, properties={"domain", "server.name", "type", "version", "data"})
  * @ApiFilter(RegexpFilter::class, properties={"domain", "server.name", "type", "version", "data"})
  */
-class Website implements \JsonSerializable
+class Website
 {
     use TimestampableEntity;
 
@@ -393,13 +393,5 @@ class Website implements \JsonSerializable
         $this->search = $search;
 
         return $this;
-    }
-
-    public function jsonSerialize()
-    {
-        return [
-            'name' => $this->getName(),
-            'server' => $this->getServerName(),
-        ];
     }
 }

@@ -13,6 +13,16 @@ easy_admin:
                 # For collapsible form filters to work, a full version should be added:
                 - 'bundles/easyadmin/bootstrap-all.js'
 
+        menu:
+            - Website
+            - Server
+            - label: 'Export'
+            - label: Website (csv)
+              route: api_websites_get_collection
+              params:
+                  _format: csv
+                  pagination: false
+
     formats:
         datetime: 'd/m/Y H:i:s'
 
