@@ -124,8 +124,6 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * @param array $query
-     *
      * @return Server[]
      */
     protected function getServers(array $query = [])
@@ -141,8 +139,6 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * @param array $servers
-     *
      * @return Server[]
      */
     protected function filterServers(array $servers)
@@ -158,8 +154,6 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * @param array $query
-     *
      * @return Website[]
      */
     protected function getWebsites(array $query = [])
@@ -168,8 +162,6 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * @param array $types
-     *
      * @return Website[]
      */
     protected function getWebsitesByTypes(array $types)

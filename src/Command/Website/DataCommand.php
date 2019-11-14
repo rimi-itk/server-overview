@@ -41,9 +41,11 @@ class DataCommand extends AbstractCommand
 
             foreach ($providers as $provider) {
                 $key = $provider->getKey();
+
                 if (!empty($keys) && !\in_array($key, $keys, true)) {
                     continue;
                 }
+
                 if ($provider->canHandle($website)) {
                     $command = 'cd '.$website->getDocumentRoot().' && '.$provider->getCommand($website);
                     $output = $this->runOnServer($website->getServer(), $command);

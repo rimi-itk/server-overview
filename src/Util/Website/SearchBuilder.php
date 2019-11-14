@@ -51,20 +51,25 @@ class SearchBuilder
     {
         $modulesData = [];
 
-        $data = json_decode($website->getData(), true);
-        if (null !== $data) {
-            if (preg_match('/^drupal/', $website->getType())) {
-                $items = $data['Enabled'] ?? $data['installed'] ?? [];
-                $status = 'installed';
-                foreach ($items as $item) {
-                    $name = $item['name'] ?? $item['display_name'] ?? null;
-                    if (null !== $name) {
-                        if (preg_match('/\((?P<name>[^)]+)\)/', $name, $matches)) {
-                            $moduleName = $matches['name'];
-                            $modulesData[] = $moduleName.':'.$status;
-                            if (isset($item['version'])) {
-                                $modulesData[] = $moduleName.':'.$item['version'].':'.$status;
-                            }
+        $data = $website->getData();
+        $type = $website->getType();
+
+        if (Website::TYPE_DRUPAL_MULTISITE === $type) {
+            $type = Website::TYPE_DRUPAL;
+        }
+
+        if (isset($data[$type])) {
+            $items = $data[$type]['Enabled'] ?? $data[$type]['installed'] ?? [];
+            $status = 'installed';
+
+            foreach ($items as $item) {
+                $name = $item['name'] ?? $item['display_name'] ?? null;
+                if (null !== $name) {
+                    if (preg_match('/\((?P<name>[^)]+)\)/', $name, $matches)) {
+                        $moduleName = $matches['name'];
+                        $modulesData[] = $moduleName.':'.$status;
+                        if (isset($item['version'])) {
+                            $modulesData[] = $moduleName.':'.$item['version'].':'.$status;
                         }
                     }
                 }

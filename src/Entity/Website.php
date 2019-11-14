@@ -31,8 +31,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     itemOperations={"get"},
  *     normalizationContext={"groups"={"read"}}
  * )
- * @ApiFilter(SearchFilter::class, properties={"domain", "server.name", "type", "version", "data"})
- * @ApiFilter(RegexpFilter::class, properties={"domain", "server.name", "type", "version", "data"})
+ * @ApiFilter(SearchFilter::class, properties={"domain", "server.name", "type", "version", "data": "partial", "search": "partial"})
+ * @ApiFilter(RegexpFilter::class, properties={"domain", "server.name", "type", "version", "data", "search"})
  */
 class Website
 {
@@ -173,8 +173,6 @@ class Website
     /**
      * Set server.
      *
-     * @param Server $server
-     *
      * @return Website
      */
     public function setServer(Server $server)
@@ -291,8 +289,6 @@ class Website
 
     /**
      * Set data.
-     *
-     * @param null|array $data
      *
      * @return Website
      */

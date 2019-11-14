@@ -1,7 +1,4 @@
 {
-    "alterphp/easyadmin-extension-bundle": {
-        "version": "v1.3.1"
-    },
     "api-platform/api-pack": {
         "version": "1.1.0"
     },
@@ -25,9 +22,6 @@
     },
     "composer/xdebug-handler": {
         "version": "1.1.0"
-    },
-    "cweagans/composer-patches": {
-        "version": "1.6.5"
     },
     "deployer/deployer": {
         "version": "v6.2.0"
@@ -122,9 +116,6 @@
     "egulias/email-validator": {
         "version": "2.1.4"
     },
-    "facebook/webdriver": {
-        "version": "1.6.0"
-    },
     "fig/link-util": {
         "version": "1.0.0"
     },
@@ -145,24 +136,6 @@
     },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
-    },
-    "league/uri-components": {
-        "version": "1.8.2"
-    },
-    "league/uri-hostname-parser": {
-        "version": "1.1.1"
-    },
-    "league/uri-interfaces": {
-        "version": "1.1.1"
-    },
-    "league/uri-manipulations": {
-        "version": "1.5.0"
-    },
-    "league/uri-parser": {
-        "version": "1.4.1"
-    },
-    "league/uri-schemes": {
-        "version": "1.2.1"
     },
     "lexik/form-filter-bundle": {
         "version": "v5.0.7"
@@ -209,17 +182,11 @@
     "psr/container": {
         "version": "1.0.0"
     },
-    "psr/http-message": {
-        "version": "1.0.1"
-    },
     "psr/link": {
         "version": "1.0.0"
     },
     "psr/log": {
         "version": "1.0.2"
-    },
-    "psr/simple-cache": {
-        "version": "1.0.1"
     },
     "sensio/framework-extra-bundle": {
         "version": "4.0",
@@ -353,6 +320,9 @@
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
     },
+    "symfony/mime": {
+        "version": "v4.3.6"
+    },
     "symfony/monolog-bridge": {
         "version": "v4.1.0"
     },
@@ -370,9 +340,6 @@
     },
     "symfony/orm-pack": {
         "version": "v1.0.5"
-    },
-    "symfony/panther": {
-        "version": "v0.2.0"
     },
     "symfony/phpunit-bridge": {
         "version": "3.3",
@@ -394,6 +361,9 @@
     },
     "symfony/polyfill-php72": {
         "version": "v1.8.0"
+    },
+    "symfony/polyfill-php73": {
+        "version": "v1.12.0"
     },
     "symfony/process": {
         "version": "v4.1.0"

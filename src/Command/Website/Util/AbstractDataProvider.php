@@ -32,8 +32,6 @@ abstract class AbstractDataProvider
     }
 
     /**
-     * @param Website $website
-     *
      * @return bool
      */
     abstract public function canHandle(Website $website);
@@ -44,8 +42,6 @@ abstract class AbstractDataProvider
     }
 
     /**
-     * @param Website $website
-     *
      * @return string
      */
     public function getCommand(Website $website)
@@ -58,9 +54,6 @@ abstract class AbstractDataProvider
     }
 
     /**
-     * @param string  $output
-     * @param Website $website
-     *
      * @return null|array
      */
     abstract public function getData(string $output, Website $website);

@@ -28,8 +28,6 @@ abstract class AbstractDetector
 
     /**
      * AbstractDetector constructor.
-     *
-     * @param string $type
      */
     public function __construct(string $type)
     {
@@ -45,8 +43,6 @@ abstract class AbstractDetector
     }
 
     /**
-     * @param Website $website
-     *
      * @return string
      */
     public function getCommand(Website $website)
@@ -59,9 +55,6 @@ abstract class AbstractDetector
     }
 
     /**
-     * @param string  $output
-     * @param Website $website
-     *
      * @return string
      */
     abstract public function getVersion(string $output, Website $website);

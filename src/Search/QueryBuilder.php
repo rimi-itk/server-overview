@@ -1,9 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: rimi
- * Date: 03/11/2018
- * Time: 13.53
+
+/*
+ * This file is part of ITK Sites.
+ *
+ * (c) 2018–2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
  */
 
 namespace App\Search;
@@ -17,27 +19,32 @@ class QueryBuilder extends BaseQueryBuilder
      */
     public function createSearchQueryBuilder(array $entityConfig, $searchQuery, $sortField = null, $sortDirection = null, $dqlFilter = null)
     {
-        /* @var EntityManager */
-        $em = $this->doctrine->getManagerForClass($entityConfig['class']);
-        /* @var DoctrineQueryBuilder */
+        // Hack to get (private) doctrine from parent.
+        $property = new \ReflectionProperty(BaseQueryBuilder::class, 'doctrine');
+        $property->setAccessible(true);
+        $doctrine = $property->getValue($this);
+
+        // @var EntityManager
+        $em = $doctrine->getManagerForClass($entityConfig['class']);
+        // @var DoctrineQueryBuilder
         $queryBuilder = $em->createQueryBuilder()
             ->select('entity')
             ->from($entityConfig['class'], 'entity')
         ;
 
         $isSearchQueryNumeric = is_numeric($searchQuery);
-        $isSearchQuerySmallInteger = (is_int($searchQuery) || ctype_digit($searchQuery)) && $searchQuery >= -32768 && $searchQuery <= 32767;
-        $isSearchQueryInteger = (is_int($searchQuery) || ctype_digit($searchQuery)) && $searchQuery >= -2147483648 && $searchQuery <= 2147483647;
+        $isSearchQuerySmallInteger = (\is_int($searchQuery) || ctype_digit($searchQuery)) && $searchQuery >= -32768 && $searchQuery <= 32767;
+        $isSearchQueryInteger = (\is_int($searchQuery) || ctype_digit($searchQuery)) && $searchQuery >= -2147483648 && $searchQuery <= 2147483647;
         $isSearchQueryUuid = 1 === preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $searchQuery);
         $lowerSearchQuery = mb_strtolower($searchQuery);
 
-        $queryParameters = array();
-        $entitiesAlreadyJoined = array();
+        $queryParameters = [];
+        $entitiesAlreadyJoined = [];
         foreach ($entityConfig['search']['fields'] as $fieldName => $metadata) {
             $entityName = 'entity';
             if (false !== strpos($fieldName, '.')) {
                 list($associatedEntityName, $associatedFieldName) = explode('.', $fieldName);
-                if (!in_array($associatedEntityName, $entitiesAlreadyJoined)) {
+                if (!\in_array($associatedEntityName, $entitiesAlreadyJoined, true)) {
                     $queryBuilder->leftJoin('entity.'.$associatedEntityName, $associatedEntityName);
                     $entitiesAlreadyJoined[] = $associatedEntityName;
                 }
@@ -48,8 +55,8 @@ class QueryBuilder extends BaseQueryBuilder
 
             $isSmallIntegerField = 'smallint' === $metadata['dataType'];
             $isIntegerField = 'integer' === $metadata['dataType'];
-            $isNumericField = in_array($metadata['dataType'], array('number', 'bigint', 'decimal', 'float'));
-            $isTextField = in_array($metadata['dataType'], array('string', 'text'));
+            $isNumericField = \in_array($metadata['dataType'], ['number', 'bigint', 'decimal', 'float'], true);
+            $isTextField = \in_array($metadata['dataType'], ['string', 'text'], true);
             $isGuidField = 'guid' === $metadata['dataType'];
 
             // this complex condition is needed to avoid issues on PostgreSQL databases
@@ -87,7 +94,7 @@ class QueryBuilder extends BaseQueryBuilder
             }
         }
 
-        if (0 !== count($queryParameters)) {
+        if (0 !== \count($queryParameters)) {
             $queryBuilder->setParameters($queryParameters);
         }
 
@@ -98,7 +105,7 @@ class QueryBuilder extends BaseQueryBuilder
         $isSortedByDoctrineAssociation = false !== strpos($sortField, '.');
         if ($isSortedByDoctrineAssociation) {
             list($associatedEntityName, $associatedFieldName) = explode('.', $sortField);
-            if (!in_array($associatedEntityName, $entitiesAlreadyJoined)) {
+            if (!\in_array($associatedEntityName, $entitiesAlreadyJoined, true)) {
                 $queryBuilder->leftJoin('entity.'.$associatedEntityName, $associatedEntityName);
                 $entitiesAlreadyJoined[] = $associatedEntityName;
             }
