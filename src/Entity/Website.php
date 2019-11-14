@@ -128,6 +128,7 @@ class Website
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Groups("read")
      */
     private $search;
 
