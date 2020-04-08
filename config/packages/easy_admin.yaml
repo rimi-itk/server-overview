@@ -29,17 +29,20 @@ easy_admin:
     entities:
          Website:
              class: App\Entity\Website
-             disabled_actions: ['new', 'edit', 'delete']
+             disabled_actions: ['new', 'delete']
              list:
                  actions: ['show']
                  max_results: 300
+
+                 dql_filter: 'entity.active = true'
+
                  # form_filters:
                  #     - property: server
                  #     - property: type
                  #       type_options:
                  #           choices_static_callback: [getValuesList, [type]]
 
-                 filters: ['type', 'server']
+                 filters: ['type', 'server', 'audiences']
 
                  fields:
                      - property: domain
@@ -48,6 +51,8 @@ easy_admin:
                      # - property: documentRoot
                      - property: type
                      - property: version
+                     - property: audiences
+                       template: easy_admin/Website/list/audiences.html.twig
                      - property: data
                        template: easy_admin/Website/data.html.twig
                      - property: updatedAt
@@ -60,12 +65,23 @@ easy_admin:
                      - property: documentRoot
                      - property: type
                      - property: version
+                     - property: audiences
                      - property: git
                        template: easy_admin/Website/data/git.html.twig
                      - property: data
                        template: easy_admin/Website/data.html.twig
                      - property: updatedAt
                      - property: search
+
+             edit:
+                 fields:
+                     - property: domain
+                       type_options:
+                           disabled: true
+                     - property: comments
+                     - property: audiences
+                       type_options:
+                           expanded: true
 
          Server:
              class: App\Entity\Server
@@ -74,7 +90,7 @@ easy_admin:
                  filters: ['name']
 
                  actions: ['show']
-                 max_results: 50
+                 max_results: 100
                  sort: [name, ASC]
                  fields:
                      - property: name
@@ -100,4 +116,16 @@ easy_admin:
              form:
                  fields:
                      - property: name
+                       type_options:
+                           disabled: true
                      - property: enabled
+
+
+         Audience:
+             class: App\Entity\Audience
+             disabled_actions: ['delete']
+
+             form:
+                 fields:
+                     - property: id
+                     - property: name

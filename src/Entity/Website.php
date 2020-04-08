@@ -15,6 +15,8 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Filter\RegexpFilter;
 use App\Repository\WebsiteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
@@ -131,6 +133,21 @@ class Website
      * @Groups("read")
      */
     private $search;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Audience")
+     */
+    private $audiences;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $active = true;
+
+    public function __construct()
+    {
+        $this->audiences = new ArrayCollection();
+    }
 
     public function __toString()
     {
@@ -384,6 +401,44 @@ class Website
     public function setSearch(?string $search): self
     {
         $this->search = $search;
+
+        return $this;
+    }
+
+    /**
+     * @return Audience[]|Collection
+     */
+    public function getAudiences(): Collection
+    {
+        return $this->audiences;
+    }
+
+    public function addAudience(Audience $audience): self
+    {
+        if (!$this->audiences->contains($audience)) {
+            $this->audiences[] = $audience;
+        }
+
+        return $this;
+    }
+
+    public function removeAudience(Audience $audience): self
+    {
+        if ($this->audiences->contains($audience)) {
+            $this->audiences->removeElement($audience);
+        }
+
+        return $this;
+    }
+
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
 
         return $this;
     }

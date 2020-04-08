@@ -27,14 +27,13 @@ class GetCommand extends AbstractCommand
     {
         $servers = $this->getServers();
 
+        $allDomains = array_map(static function (Website $website) {
+            return $website->getDomain();
+        }, $this->websiteRepository->findAll());
+        $activeDomains = [];
+
         foreach ($servers as $server) {
             $this->notice($server->getName());
-
-            $existing = $this->websiteRepository->findByServer($server);
-            foreach ($existing as $existing) {
-                $this->entityManager->remove($existing);
-            }
-            $this->entityManager->flush();
 
             $cmd = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$server->getName().' "for f in /etc/{apache,nginx}*/sites-enabled/*; do echo --- \$f; [ -e $f ] && grep --no-messages \'^[[:space:]]*\(server_name\|root\|proxy_pass\|Server\(Name\|Alias\)\|DocumentRoot\)\' \$f; done"';
 
@@ -81,11 +80,13 @@ class GetCommand extends AbstractCommand
                                         $website
                                             ->setDomain($domain)
                                             ->setServer($server)
+                                            ->setActive(true)
                                             ->setDocumentRoot($documentRoot);
 
                                         $this->info('  '.$website->getDomain());
 
                                         $this->persist($website);
+                                        $activeDomains[] = $domain;
                                     }
                                     $domains = null;
                                 }
@@ -95,5 +96,14 @@ class GetCommand extends AbstractCommand
                 }
             }
         }
+
+        $inactiveDomains = array_diff($allDomains, $activeDomains);
+        $inactiveWebsites = $this->websiteRepository->findBy(['domain' => $inactiveDomains]);
+        foreach ($inactiveWebsites as $website) {
+            $website->setActive(false);
+            $this->persist($website, false);
+            $this->info('  inactive: '.$website->getDomain());
+        }
+        $this->flush();
     }
 }

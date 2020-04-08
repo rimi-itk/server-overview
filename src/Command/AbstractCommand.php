@@ -212,9 +212,16 @@ abstract class AbstractCommand extends Command
         return (\count($result) > 0) ? $result[0] : null;
     }
 
-    protected function persist($entity)
+    protected function persist($entity, bool $flush = true)
     {
         $this->entityManager->persist($entity);
+        if ($flush) {
+            $this->flush();
+        }
+    }
+
+    protected function flush()
+    {
         $this->entityManager->flush();
     }
 

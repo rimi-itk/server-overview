@@ -1,0 +1,8 @@
+<div class="website-audiences">
+    {% for audience in value -%}
+        {% if not loop.first %}, {% endif %}
+        {% set filter_url = current_path({filters: {audiences: {comparison: '=', value: [audience.id]}}}) %}
+
+        <a href="{{ filter_url }}" title="{{ 'Filter by “%name%”'|trans({'%name%': audience.name}) }}">{{ audience.name }}</a>
+    {%- endfor %}
+</div>
