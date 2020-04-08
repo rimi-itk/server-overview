@@ -13,11 +13,11 @@ namespace App\Repository;
 use App\Entity\Website;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 class WebsiteRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry, EntityManagerInterface $entityManager)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Website::class);
     }
