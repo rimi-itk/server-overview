@@ -8,7 +8,6 @@
         "api-platform/api-pack": "^1.1",
         "beberlei/doctrineextensions": "^1.1",
         "easycorp/easyadmin-bundle": "^2.1",
-        "itk-dev/database-bundle": "^1.2",
         "lexik/form-filter-bundle": "^5.0",
         "sensio/framework-extra-bundle": "^5.1",
         "stof/doctrine-extensions-bundle": "^1.3",

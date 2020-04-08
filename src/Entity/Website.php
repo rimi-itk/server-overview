@@ -230,10 +230,6 @@ class Website
     public function getProjectDir()
     {
         if (self::TYPE_SYMFONY === $this->getType()) {
-//            header('Content-type: text/plain'); echo var_export([
-//                $this->getDocumentRoot(),
-//                dirname($this->getDocumentRoot()),
-//            ], true); die(__FILE__.':'.__LINE__.':'.__METHOD__);
             return \dirname($this->getDocumentRoot());
         }
 
