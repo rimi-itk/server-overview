@@ -27,13 +27,15 @@ class GetCommand extends AbstractCommand
     {
         $servers = $this->getServers();
 
-        $allDomains = array_map(static function (Website $website) {
-            return $website->getDomain();
-        }, $this->websiteRepository->findAll());
-        $activeDomains = [];
-
         foreach ($servers as $server) {
             $this->notice($server->getName());
+
+            $domains = $this->websiteRepository->findBy(['server' => $server]);
+            foreach ($domains as $domain) {
+                $domain->setActive(false);
+                $this->persist($domain, false);
+            }
+            $this->flush();
 
             $cmd = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -A deploy@'.$server->getName().' "for f in /etc/{apache,nginx}*/sites-enabled/*; do echo --- \$f; [ -e $f ] && grep --no-messages \'^[[:space:]]*\(server_name\|root\|proxy_pass\|Server\(Name\|Alias\)\|DocumentRoot\)\' \$f; done"';
 
@@ -96,14 +98,5 @@ class GetCommand extends AbstractCommand
                 }
             }
         }
-
-        $inactiveDomains = array_diff($allDomains, $activeDomains);
-        $inactiveWebsites = $this->websiteRepository->findBy(['domain' => $inactiveDomains]);
-        foreach ($inactiveWebsites as $website) {
-            $website->setActive(false);
-            $this->persist($website, false);
-            $this->info('  inactive: '.$website->getDomain());
-        }
-        $this->flush();
     }
 }
