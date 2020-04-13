@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -24,7 +24,7 @@ class ListCommand extends AbstractCommand
         $this->setDescription('List servers');
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $servers = $this->getServers();
 

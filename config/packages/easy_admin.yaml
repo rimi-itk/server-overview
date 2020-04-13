@@ -16,6 +16,8 @@ easy_admin:
         menu:
             - Website
             - Server
+            - label: 'Misc'
+            - Audience
             - label: 'Export'
             - label: Website (csv)
               route: api_websites_get_collection
@@ -34,13 +36,7 @@ easy_admin:
                  actions: ['show']
                  max_results: 300
 
-                 dql_filter: 'entity.active = true'
-
-                 # form_filters:
-                 #     - property: server
-                 #     - property: type
-                 #       type_options:
-                 #           choices_static_callback: [getValuesList, [type]]
+                 dql_filter: 'entity.enabled = true'
 
                  filters: ['type', 'server', 'audiences']
 
@@ -50,9 +46,13 @@ easy_admin:
                      - property: server
                      # - property: documentRoot
                      - property: type
+                       template: easy_admin/Website/list/filter.html.twig
                      - property: version
                      - property: audiences
-                       template: easy_admin/Website/list/audiences.html.twig
+                       template: easy_admin/Website/list/filter.html.twig
+                     - property: comments
+                       sortable: false
+                       template: easy_admin/Website/list/comments.html.twig
                      - property: data
                        template: easy_admin/Website/data.html.twig
                      - property: updatedAt

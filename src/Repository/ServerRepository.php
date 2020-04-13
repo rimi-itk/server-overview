@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -28,10 +28,7 @@ class ServerRepository extends ServiceEntityRepository
         parent::__construct($registry, Server::class);
     }
 
-    /**
-     * @return array
-     */
-    public function findEnabled()
+    public function findEnabled(): array
     {
         return $this->createQueryBuilder('s')
             ->andWhere('s.enabled = :enabled')

@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -15,9 +15,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\AudienceRepository")
  * @UniqueEntity(fields={"id"})
+ * @ApiResource(
+ *     collectionOperations={"get"},
+ *     itemOperations={"get"},
+ *     normalizationContext={"groups"={"read"}}
+ * )
  */
 class Audience
 {

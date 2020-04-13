@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -40,7 +40,7 @@ final class RegexpFilter extends AbstractContextAwareFilter
         return $description;
     }
 
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null): void
     {
         $property = preg_replace('/^regexp_/', '', $property);
         // otherwise filter is applied to order and page as well

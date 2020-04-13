@@ -1,0 +1,34 @@
+<div class="website-comments">
+    {% if value %}
+        {% set id = 'website-' ~ item.id ~ '-comment' %}
+        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#{{ id }}">
+            {#<div class="website-comment website-comment-excerpt">{{ value }}</div>#}
+            <i class="fa fa-comments fa-fw"></i>
+        </button>
+
+        <div class="modal fade" id="{{ id }}" tabindex="-1" role="dialog" aria-labelledby="{{ id }}Label" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="{{ id }}Label">{{ 'Comments on %domain%'|trans({'%domain%': item.domain}) }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="website-comment">{{ value }}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ 'Close'|trans }}</button>
+                        {% set edit_url = path_with_referer('easyadmin', {
+                            entity: entity_config.name,
+                            action: 'edit',
+                            id: item.id
+                            }) %}
+                        <a href="{{ edit_url }}" class="btn btn-primary">{{ 'Edit comment'|trans }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>

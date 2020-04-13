@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -26,20 +26,20 @@ class UpdatesCommand extends AbstractCommand
             ->addOption('types', null, InputOption::VALUE_REQUIRED, 'Type of sites to process');
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $types = array_filter(preg_split('/\s*,\s*/', $this->input->getOption('types'), PREG_SPLIT_NO_EMPTY));
         $websites = $types ? $this->getWebsitesByTypes($types) : $this->getWebsites();
 
         $detectors = [
             'drupal (multisite)' => [
-                'getCommand' => function (Website $website) {
+                'getCommand' => static function (Website $website) {
                     $siteDirectory = 'sites/'.$website->getDomain();
 
                     return "cd $siteDirectory && drush pm-list --format=json";
                 },
                 'getData' => function (array $output, Website $website) {
-                    $data = json_decode(implode(PHP_EOL, $output));
+                    $data = $this->parseJson(implode(PHP_EOL, $output));
 
                     $buckets = [
                         'Enabled' => [],
@@ -51,13 +51,13 @@ class UpdatesCommand extends AbstractCommand
                         $buckets[$item->status][] = $item;
                     }
 
-                    return json_encode($buckets);
+                    return json_encode($buckets, JSON_THROW_ON_ERROR, 512);
                 },
             ],
             'drupal' => [
                 'command' => 'drush pm-list --format=json',
                 'getData' => function (array $output) {
-                    $data = json_decode(implode(PHP_EOL, $output));
+                    $data = $this->parseJson(implode(PHP_EOL, $output));
 
                     $buckets = [
                         'Enabled' => [],
@@ -69,13 +69,13 @@ class UpdatesCommand extends AbstractCommand
                         $buckets[$item->status][] = $item;
                     }
 
-                    return json_encode($buckets);
+                    return json_encode($buckets, JSON_THROW_ON_ERROR, 512);
                 },
             ],
         ];
 
         foreach ($websites as $website) {
-            $this->notice($website->getDomain());
+            $this->info('Domain {domain}', ['domain' => $website->getDomain()]);
 
             if (isset($detectors[$website->getType()])) {
                 $detector = $detectors[$website->getType()];

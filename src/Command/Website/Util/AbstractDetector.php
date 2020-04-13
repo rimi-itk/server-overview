@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -11,6 +11,8 @@
 namespace App\Command\Website\Util;
 
 use App\Entity\Website;
+use JsonException;
+use RuntimeException;
 
 abstract class AbstractDetector
 {
@@ -34,28 +36,28 @@ abstract class AbstractDetector
         $this->type = $type;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
-    public function getCommand(Website $website)
+    public function getCommand(Website $website): string
     {
         if (null === $this->command) {
-            throw new \RuntimeException('command is not defined in '.static::class);
+            throw new RuntimeException('command is not defined in '.static::class);
         }
 
         return $this->command;
     }
 
-    /**
-     * @return string
-     */
-    abstract public function getVersion(string $output, Website $website);
+    abstract public function getVersion(string $output, Website $website): ?string;
+
+    protected function parseJson(string $json): ?array
+    {
+        try {
+            return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            return null;
+        }
+    }
 }

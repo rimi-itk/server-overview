@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -16,33 +16,32 @@ use App\Repository\WebsiteRepository;
 use App\Util\Website\SearchBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 
-class SearchRebuildCommand extends AbstractCommand
+class SearchBuildCommand extends AbstractCommand
 {
-    protected static $defaultName = 'app:website:search:rebuild';
+    protected static $defaultName = 'app:website:search:build';
 
     /** @var SearchBuilder */
-    private $searchRebuilder;
+    private $searchBuilder;
 
     public function __construct(EntityManagerInterface $entityManager, ServerRepository $serverRepository, WebsiteRepository $websiteRepository, SearchBuilder $searchRebuilder)
     {
         parent::__construct($entityManager, $serverRepository, $websiteRepository);
-        $this->searchRebuilder = $searchRebuilder;
+        $this->searchBuilder = $searchRebuilder;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
-        $this->setDescription('Rebuild search data in websites');
+        $this->setDescription('Build search data in websites');
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $websites = $this->getWebsites();
 
         foreach ($websites as $website) {
-            $this->info($website->getDomain());
-            $this->searchRebuilder->build($website);
-            $this->info(' done.');
+            $this->info('Domain {domain}', ['domain' => $website->getDomain()]);
+            $this->searchBuilder->build($website);
         }
     }
 }

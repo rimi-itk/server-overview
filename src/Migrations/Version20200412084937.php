@@ -18,14 +18,20 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20181103123512 extends AbstractMigration
+final class Version20200412084937 extends AbstractMigration
 {
+    public function getDescription(): string
+    {
+        return '';
+    }
+
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE server ADD created_at DATETIME NOT NULL, ADD updated_at DATETIME NOT NULL');
+        $this->addSql('ALTER TABLE server CHANGE data data LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:json)\'');
+        $this->addSql('ALTER TABLE website CHANGE data data LONGTEXT DEFAULT NULL COMMENT \'(DC2Type:json)\', CHANGE active enabled TINYINT(1) NOT NULL');
     }
 
     public function down(Schema $schema): void
@@ -33,6 +39,7 @@ final class Version20181103123512 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE server DROP created_at, DROP updated_at');
+        $this->addSql('ALTER TABLE server CHANGE data data LONGTEXT CHARACTER SET utf8mb4 DEFAULT NULL COLLATE `utf8mb4_bin` COMMENT \'(DC2Type:json_array)\'');
+        $this->addSql('ALTER TABLE website CHANGE data data LONGTEXT CHARACTER SET utf8mb4 DEFAULT NULL COLLATE `utf8mb4_unicode_ci` COMMENT \'(DC2Type:json_array)\', CHANGE enabled active TINYINT(1) NOT NULL');
     }
 }

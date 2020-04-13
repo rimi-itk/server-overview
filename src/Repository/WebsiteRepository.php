@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -31,7 +31,7 @@ class WebsiteRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public static function getValuesList($property)
+    public static function getValuesList($property): array
     {
         return [];
     }

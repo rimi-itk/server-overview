@@ -1,67 +1,67 @@
 {% if view == 'list' %}
-	{{ value ? '…' : '–' }}
+    {{ value ? '…' : '–' }}
 {% elseif view == 'show' %}
-	{% set data = value %}
+    {% set data = value %}
 
-	<div class="website-data" style="max-height: 32em; overflow: auto;">
+    <div class="website-data" style="max-height: 32em; overflow: auto;">
 
         {% if data is null %}
 
             {{ '–' }}
 
-		{% elseif data.drupal|default(false) %}
+        {% elseif data.drupal|default(false) %}
 
-			<table class="table table-sm table-hover">
-				<thead>
-					<th>Package</th>
-					<th>Name</th>
-					<th>Type</th>
-					<th>Status</th>
-					<th>Version</th>
-				</thead>
+            <table class="table table-sm table-hover">
+                <thead>
+                    <th>Package</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Version</th>
+                </thead>
 
-				{% for status, items in data.drupal %}
-					<tbody>
-						{% for item in items %}
-							<tr>
-								<td>{{ item.package }}</td>
-								<td>{{ item.name|default(item.display_name|default('–')) }}</td>
-								<td>{{ item.type|default('–') }}</td>
-								<td>{{ item.status }}</td>
-								<td>{{ item.version }}</td>
-							</tr>
-						{% endfor %}
-					</tbody>
-				{% endfor %}
+                {% for status, items in data.drupal %}
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>{{ item.package }}</td>
+                                <td>{{ item.name|default(item.display_name|default('–')) }}</td>
+                                <td>{{ item.type|default('–') }}</td>
+                                <td>{{ item.status }}</td>
+                                <td>{{ item.version }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                {% endfor %}
 
-			</table>
+            </table>
 
-		{% elseif data.symfony|default(false) %}
+        {% elseif data.symfony|default(false) %}
 
-			<table class="table table-sm table-hover">
-				<thead>
-					<th>Name</th>
-					<th>Version</th>
-					<th>Description</th>
-				</thead>
-				{% for status, items in data.symfony %}
-					<tbody>
-						{% for item in items %}
-							<tr>
-								<td>{{ item.name }}</td>
-								<td>{{ item.version }}</td>
-								<td>{{ item.description }}</td>
-							</tr>
-						{% endfor %}
-					</tbody>
-				{% endfor %}
-			</table>
-		{% else %}
+            <table class="table table-sm table-hover">
+                <thead>
+                    <th>Name</th>
+                    <th>Version</th>
+                    <th>Description</th>
+                </thead>
+                {% for status, items in data.symfony %}
+                    <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.version }}</td>
+                                <td>{{ item.description }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                {% endfor %}
+            </table>
+        {% else %}
 
-			{{ data|json_encode(constant('JSON_PRETTY_PRINT')) }}
+            {{ data|json_encode(constant('JSON_PRETTY_PRINT')) }}
 
         {% endif %}
 
-	</div>
+    </div>
 
 {% endif %}

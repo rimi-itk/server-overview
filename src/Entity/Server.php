@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use JsonSerializable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -27,7 +28,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     normalizationContext={"groups"={"read"}}
  * )
  */
-class Server implements \JsonSerializable
+class Server implements JsonSerializable
 {
     use TimestampableEntity;
 
@@ -46,7 +47,7 @@ class Server implements \JsonSerializable
     private $name;
 
     /**
-     * @ORM\Column(type="json_array", nullable=true)
+     * @ORM\Column(type="json", nullable=true)
      */
     private $data;
 
@@ -111,7 +112,7 @@ class Server implements \JsonSerializable
     {
         if (!$this->websites->contains($website)) {
             $this->websites[] = $website;
-            $website->setServerRef($this);
+            $website->setServer($this);
         }
 
         return $this;
@@ -122,8 +123,8 @@ class Server implements \JsonSerializable
         if ($this->websites->contains($website)) {
             $this->websites->removeElement($website);
             // set the owning side to null (unless already changed)
-            if ($website->getServerRef() === $this) {
-                $website->setServerRef(null);
+            if ($website->getServer() === $this) {
+                $website->setServer(null);
             }
         }
 

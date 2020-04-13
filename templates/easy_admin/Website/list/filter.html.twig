@@ -1,0 +1,33 @@
+{% macro render_value(value, property, is_iterable = false) %}
+    {% if value %}
+        {% set filter_value = value.id|default(value.name|default(value)) %}
+        {% set current_filter_value = app.request.get('filters')[property]['value']|default(null) %}
+        {% set is_filter_applied = is_iterable ? (filter_value in current_filter_value) : (current_filter_value == filter_value) %}
+
+        {% if is_filter_applied %}
+            {% set filter_url = current_path({filters: {(property): null }}) %}
+            {{ value }}
+            <a class="action-filters-reset" href="{{ filter_url }}" title="{{ 'Remove filter by “%value%”'|trans({'%value%': value}) }}">
+                <i class="fa fa-close"></i>
+            </a>
+        {% else %}
+            {% set filter_url = current_path({filters: {(property): {comparison: '=', value: is_iterable ? [filter_value] : filter_value}}}) %}
+
+            <a href="{{ filter_url }}" title="{{ 'Filter by “%value%”'|trans({'%value%': value}) }}">
+                {{ value }}
+                {#<i class="fa fa-filter fa-fw"></i>#}
+            </a>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+<div class="website-{{ field_options.property }}">
+    {% if value is iterable %}
+        {% for item in value -%}
+            {% if not loop.first %}, {% endif %}
+            {{ _self.render_value(item, field_options.property, true) }}
+        {%- endfor %}
+    {% else %}
+        {{ _self.render_value(value, field_options.property) }}
+    {% endif %}
+</div>

@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -11,6 +11,7 @@
 namespace App\Search;
 
 use EasyCorp\Bundle\EasyAdminBundle\Search\QueryBuilder as BaseQueryBuilder;
+use ReflectionProperty;
 
 class QueryBuilder extends BaseQueryBuilder
 {
@@ -20,7 +21,7 @@ class QueryBuilder extends BaseQueryBuilder
     public function createSearchQueryBuilder(array $entityConfig, $searchQuery, $sortField = null, $sortDirection = null, $dqlFilter = null)
     {
         // Hack to get (private) doctrine from parent.
-        $property = new \ReflectionProperty(BaseQueryBuilder::class, 'doctrine');
+        $property = new ReflectionProperty(BaseQueryBuilder::class, 'doctrine');
         $property->setAccessible(true);
         $doctrine = $property->getValue($this);
 

@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -15,6 +15,7 @@ use App\Entity\Website;
 use App\Repository\ServerRepository;
 use App\Repository\WebsiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use JsonException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\Console\Command\Command;
@@ -64,10 +65,14 @@ abstract class AbstractCommand extends Command
         $this->websiteRepository = $websiteRepository;
     }
 
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         if (!is_scalar($message)) {
-            $message = json_encode($message, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            $message = json_encode(
+                $message,
+                JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
+                512
+            );
         }
 
         $this->logger->log($level, $message, $context);
@@ -103,11 +108,13 @@ abstract class AbstractCommand extends Command
         }
 
         $this->runCommand();
+
+        return 0;
     }
 
-    abstract protected function runCommand();
+    abstract protected function runCommand(): void;
 
-    protected function runOnServer(Server $server, $command)
+    protected function runOnServer(Server $server, $command): string
     {
         $process = new Process([
             'ssh',
@@ -126,7 +133,7 @@ abstract class AbstractCommand extends Command
     /**
      * @return Server[]
      */
-    protected function getServers(array $query = [])
+    protected function getServers(array $query = []): array
     {
         $query += [
             'enabled' => true,
@@ -141,11 +148,11 @@ abstract class AbstractCommand extends Command
     /**
      * @return Server[]
      */
-    protected function filterServers(array $servers)
+    protected function filterServers(array $servers): array
     {
         $names = $this->input->getOption('server');
         if (\count($names) > 0) {
-            $servers = array_filter($servers, function (Server $server) use ($names) {
+            $servers = array_filter($servers, static function (Server $server) use ($names) {
                 return \in_array($server->getName(), $names, true);
             });
         }
@@ -156,15 +163,19 @@ abstract class AbstractCommand extends Command
     /**
      * @return Website[]
      */
-    protected function getWebsites(array $query = [])
+    protected function getWebsites(array $query = []): array
     {
+        $query += [
+            'enabled' => true,
+        ];
+
         return $this->filterWebsites($this->websiteRepository->findBy($query));
     }
 
     /**
      * @return Website[]
      */
-    protected function getWebsitesByTypes(array $types)
+    protected function getWebsitesByTypes(array $types): array
     {
         return $this->filterWebsites($this->websiteRepository->findByTypes($types));
     }
@@ -174,18 +185,18 @@ abstract class AbstractCommand extends Command
      *
      * @return Website[]
      */
-    protected function filterWebsites(array $websites)
+    protected function filterWebsites(array $websites): array
     {
         $servers = $this->input->getOption('server');
         if (\count($servers) > 0) {
-            $websites = array_filter($websites, function (Website $website) use ($servers) {
+            $websites = array_filter($websites, static function (Website $website) use ($servers) {
                 return \in_array($website->getServer()->getName(), $servers, true);
             });
         }
 
         $domains = $this->input->getOption('domain');
         if (\count($domains) > 0) {
-            $websites = array_filter($websites, function (Website $website) use ($domains) {
+            $websites = array_filter($websites, static function (Website $website) use ($domains) {
                 return \in_array($website->getDomain(), $domains, true);
             });
         }
@@ -197,7 +208,7 @@ abstract class AbstractCommand extends Command
     {
         $servers = $this->input->getOption('server');
         if (\count($servers) > 0) {
-            $serverNames = array_filter($serverNames, function ($serverName) use ($servers) {
+            $serverNames = array_filter($serverNames, static function ($serverName) use ($servers) {
                 return \in_array($serverName, $servers, true);
             });
         }
@@ -205,14 +216,12 @@ abstract class AbstractCommand extends Command
         return $serverNames;
     }
 
-    protected function getWebsite(array $query = [])
+    protected function getWebsite(array $query = []): ?Website
     {
-        $result = $this->websiteRepository->findBy($query);
-
-        return (\count($result) > 0) ? $result[0] : null;
+        return $this->websiteRepository->findOneBy($query);
     }
 
-    protected function persist($entity, bool $flush = true)
+    protected function persist($entity, bool $flush = true): void
     {
         $this->entityManager->persist($entity);
         if ($flush) {
@@ -220,20 +229,28 @@ abstract class AbstractCommand extends Command
         }
     }
 
-    protected function flush()
+    protected function flush(): void
     {
         $this->entityManager->flush();
     }
 
-    protected function debug()
+    protected function parseJson(string $json): ?array
+    {
+        try {
+            return json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            return null;
+        }
+    }
+
+    protected function debug(): void
     {
         if ($this->output->isDebug()) {
-            $args = \func_get_args();
-            foreach ($args as &$arg) {
-                if (!is_scalar($arg)) {
-                    $arg = json_encode($arg, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                }
-            }
+            $args = array_map(static function ($arg) {
+                return is_scalar($arg)
+                    ? $arg
+                    : json_encode($arg, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE, 512);
+            }, \func_get_args());
             \call_user_func_array([$this->output, 'writeln'], $args);
         }
     }

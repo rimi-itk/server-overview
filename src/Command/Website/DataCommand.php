@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -13,6 +13,7 @@ namespace App\Command\Website;
 use App\Command\AbstractCommand;
 use App\Command\Website\Util\AbstractDataProvider;
 use App\Entity\Website;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputOption;
 
 class DataCommand extends AbstractCommand
@@ -28,7 +29,7 @@ class DataCommand extends AbstractCommand
             ->addOption('key', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Data key to get');
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $types = array_filter(preg_split('/\s*,\s*/', $this->input->getOption('types'), PREG_SPLIT_NO_EMPTY));
         $keys = $this->input->getOption('key');
@@ -37,7 +38,7 @@ class DataCommand extends AbstractCommand
         $providers = $this->getProviders();
 
         foreach ($websites as $website) {
-            $this->notice($website->getDomain());
+            $this->info('Domain {domain}', ['domain' => $website->getDomain()]);
 
             foreach ($providers as $provider) {
                 $key = $provider->getKey();
@@ -53,7 +54,7 @@ class DataCommand extends AbstractCommand
                     $data = $provider->getData($output, $website);
                     if (null !== $data) {
                         if (!\is_array($data)) {
-                            throw new \RuntimeException(\get_class($provider).' must return an array');
+                            throw new RuntimeException(\get_class($provider).' must return an array');
                         }
                         $this->debug([$key => $data]);
                         $website->addData([$key => $data]);
@@ -67,20 +68,20 @@ class DataCommand extends AbstractCommand
     /**
      * @return AbstractDataProvider[]
      */
-    private function getProviders()
+    private function getProviders(): array
     {
         return [
             // Drupal (multisite)
             new class() extends AbstractDataProvider {
                 protected $key = 'drupal';
 
-                public function canHandle(Website $website)
+                public function canHandle(Website $website): bool
                 {
                     return Website::TYPE_DRUPAL_MULTISITE === $website->getType()
                         || Website::TYPE_DRUPAL === $website->getType();
                 }
 
-                public function getCommand(Website $website)
+                public function getCommand(Website $website): string
                 {
                     if (Website::TYPE_DRUPAL_MULTISITE === $website->getType()) {
                         $siteDirectory = 'sites/'.$website->getDomain();
@@ -91,9 +92,9 @@ class DataCommand extends AbstractCommand
                     return 'drush pm-list --format=json';
                 }
 
-                public function getData(string $output, Website $website)
+                public function getData(string $output, Website $website): array
                 {
-                    $data = json_decode($output) ?? [];
+                    $data = $this->parseJson($output) ?? [];
 
                     $buckets = [
                         'Enabled' => [],
@@ -102,7 +103,7 @@ class DataCommand extends AbstractCommand
                     ];
 
                     foreach ($data as $item) {
-                        $buckets[$item->status][] = $item;
+                        $buckets[$item['status']][] = $item;
                     }
 
                     return $buckets;
@@ -115,16 +116,14 @@ class DataCommand extends AbstractCommand
 
                 protected $command = 'composer --working-dir=.. show --format=json';
 
-                public function canHandle(Website $website)
+                public function canHandle(Website $website): bool
                 {
                     return Website::TYPE_SYMFONY === $website->getType();
                 }
 
-                public function getData(string $output, Website $website)
+                public function getData(string $output, Website $website): array
                 {
-                    $data = json_decode($output, true) ?? [];
-
-                    return $data;
+                    return $this->parseJson($output) ?? [];
                 }
             },
 
@@ -132,22 +131,22 @@ class DataCommand extends AbstractCommand
             new class() extends AbstractDataProvider {
                 protected $key = 'git';
 
-                public function canHandle(Website $website)
+                public function canHandle(Website $website): bool
                 {
                     return null !== $website->getDocumentRoot();
                 }
 
-                public function getCommand(Website $website)
+                public function getCommand(Website $website): string
                 {
                     return 'for d in $(find '.$website->getProjectDir().' -name .git | xargs dirname); do (cd $d && echo $d && git config --get remote.origin.url && git rev-parse --abbrev-ref HEAD && git rev-parse HEAD); done';
                 }
 
-                public function getData(string $output, Website $website)
+                public function getData(string $output, Website $website): array
                 {
                     $lines = explode(PHP_EOL, $output);
                     $chunks = array_chunk($lines, 4);
                     $data = array_map(
-                        function (array $chunk) {
+                        static function (array $chunk) {
                             return [
                                 'path' => $chunk[0],
                                 'remote' => preg_replace('/\.git$/', '', $chunk[1]),
@@ -155,13 +154,13 @@ class DataCommand extends AbstractCommand
                                 'commit' => $chunk[3],
                             ];
                         },
-                        array_filter($chunks, function (array $chunk) {
+                        array_filter($chunks, static function (array $chunk) {
                             return 4 === \count($chunk);
                         })
                     );
 
                     // Sort chunks by length of path
-                    usort($data, function (array $a, array $b) {
+                    usort($data, static function (array $a, array $b) {
                         return \strlen($a['path']) - \strlen($b['path']);
                     });
 

@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -12,6 +12,8 @@ namespace App\Util\Website;
 
 use App\Entity\Website;
 use Doctrine\ORM\EntityManagerInterface;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 
 class SearchBuilder
 {
@@ -23,7 +25,7 @@ class SearchBuilder
         $this->entityManager = $entityManager;
     }
 
-    public function build(Website $website)
+    public function build(Website $website): void
     {
         $data = $this->getSearchData($website);
         $website->setSearch($data);
@@ -31,7 +33,7 @@ class SearchBuilder
         $this->entityManager->flush();
     }
 
-    private function getSearchData(Website $website)
+    private function getSearchData(Website $website): string
     {
         $data[] = $website->getDomain();
         $data[] = 'type:'.$website->getType();
@@ -39,7 +41,7 @@ class SearchBuilder
 
         $modulesData = $this->getModulesData($website);
         // Flatten modules data
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($modulesData));
+        $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($modulesData));
         foreach ($iterator as $item) {
             $data[] = $item;
         }
@@ -47,7 +49,7 @@ class SearchBuilder
         return implode(' ', $data);
     }
 
-    private function getModulesData(Website $website)
+    private function getModulesData(Website $website): array
     {
         $modulesData = [];
 
@@ -64,13 +66,11 @@ class SearchBuilder
 
             foreach ($items as $item) {
                 $name = $item['name'] ?? $item['display_name'] ?? null;
-                if (null !== $name) {
-                    if (preg_match('/\((?P<name>[^)]+)\)/', $name, $matches)) {
-                        $moduleName = $matches['name'];
-                        $modulesData[] = $moduleName.':'.$status;
-                        if (isset($item['version'])) {
-                            $modulesData[] = $moduleName.':'.$item['version'].':'.$status;
-                        }
+                if ((null !== $name) && preg_match('/\((?P<name>[^)]+)\)/', $name, $matches)) {
+                    $moduleName = $matches['name'];
+                    $modulesData[] = $moduleName.':'.$status;
+                    if (isset($item['version'])) {
+                        $modulesData[] = $moduleName.':'.$item['version'].':'.$status;
                     }
                 }
             }

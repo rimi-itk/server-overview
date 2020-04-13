@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -17,23 +17,23 @@ class GetCommand extends AbstractCommand
 {
     protected static $defaultName = 'app:website:get';
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setDescription('Get websites from servers');
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $servers = $this->getServers();
 
         foreach ($servers as $server) {
-            $this->notice($server->getName());
+            $this->info('Server {server}', ['server' => $server->getName()]);
 
-            $domains = $this->websiteRepository->findBy(['server' => $server]);
-            foreach ($domains as $domain) {
-                $domain->setActive(false);
-                $this->persist($domain, false);
+            $websites = $this->websiteRepository->findBy(['server' => $server]);
+            foreach ($websites as $website) {
+                $website->setEnabled(false);
+                $this->persist($website, false);
             }
             $this->flush();
 
@@ -47,7 +47,7 @@ class GetCommand extends AbstractCommand
                 $lines = array_map('trim', $lines);
                 $indexes = [];
                 foreach ($lines as $index => $line) {
-                    if (preg_match('/^---/', $line)) {
+                    if (0 === strpos($line, '---')) {
                         $indexes[] = $index;
                     }
                 }
@@ -66,10 +66,12 @@ class GetCommand extends AbstractCommand
                                 if (!$domains) {
                                     $domains = [];
                                 }
-                                $domains = array_merge($domains, preg_split('/\s+/', trim($matches[1], ';'), -1, PREG_SPLIT_NO_EMPTY));
+                                foreach (preg_split('/\s+/', trim($matches[1], ';'), -1, PREG_SPLIT_NO_EMPTY) as $domain) {
+                                    $domains[] = $domain;
+                                }
                             } elseif (preg_match('/^(?:root|DocumentRoot|proxy_pass)\s+(.+)/', $line, $matches)) {
                                 if ($domains) {
-                                    $domains = array_unique(array_map(function ($domain) {
+                                    $domains = array_unique(array_map(static function ($domain) {
                                         return preg_replace('/^www\./', '', $domain);
                                     }, $domains));
                                     $documentRoot = trim($matches[1], ';');
@@ -82,13 +84,12 @@ class GetCommand extends AbstractCommand
                                         $website
                                             ->setDomain($domain)
                                             ->setServer($server)
-                                            ->setActive(true)
+                                            ->setEnabled(true)
                                             ->setDocumentRoot($documentRoot);
 
                                         $this->info('  '.$website->getDomain());
 
                                         $this->persist($website);
-                                        $activeDomains[] = $domain;
                                     }
                                     $domains = null;
                                 }

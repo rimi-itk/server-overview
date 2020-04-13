@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -102,7 +102,7 @@ class Website
     /**
      * @var array
      *
-     * @ORM\Column(name="data", type="json_array", nullable=true)
+     * @ORM\Column(name="data", type="json", nullable=true)
      */
     private $data;
 
@@ -142,7 +142,7 @@ class Website
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active = true;
+    private $enabled = true;
 
     public function __construct()
     {
@@ -156,10 +156,8 @@ class Website
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -168,10 +166,8 @@ class Website
      * Set domain.
      *
      * @param string $domain
-     *
-     * @return Website
      */
-    public function setDomain($domain)
+    public function setDomain($domain): self
     {
         $this->domain = $domain;
 
@@ -180,20 +176,16 @@ class Website
 
     /**
      * Get domain.
-     *
-     * @return string
      */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
     /**
      * Set server.
-     *
-     * @return Website
      */
-    public function setServer(Server $server)
+    public function setServer(Server $server): self
     {
         $this->server = $server;
 
@@ -202,20 +194,16 @@ class Website
 
     /**
      * Get server.
-     *
-     * @return Server
      */
-    public function getServer()
+    public function getServer(): Server
     {
         return $this->server;
     }
 
     /**
      * Get server name.
-     *
-     * @return null|string
      */
-    public function getServerName()
+    public function getServerName(): ?string
     {
         return $this->getServer()->getName();
     }
@@ -224,10 +212,8 @@ class Website
      * Set documentRoot.
      *
      * @param string $documentRoot
-     *
-     * @return Website
      */
-    public function setDocumentRoot($documentRoot)
+    public function setDocumentRoot($documentRoot): self
     {
         $this->documentRoot = $documentRoot;
 
@@ -236,15 +222,13 @@ class Website
 
     /**
      * Get documentRoot.
-     *
-     * @return string
      */
-    public function getDocumentRoot()
+    public function getDocumentRoot(): string
     {
         return $this->documentRoot;
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         if (self::TYPE_SYMFONY === $this->getType()) {
             return \dirname($this->getDocumentRoot());
@@ -257,10 +241,8 @@ class Website
      * Set type.
      *
      * @param string $type
-     *
-     * @return Website
      */
-    public function setType($type)
+    public function setType($type): self
     {
         $this->type = $type;
 
@@ -269,10 +251,8 @@ class Website
 
     /**
      * Get type.
-     *
-     * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -281,10 +261,8 @@ class Website
      * Set version.
      *
      * @param string $version
-     *
-     * @return Website
      */
-    public function setVersion($version)
+    public function setVersion($version): self
     {
         $this->version = $version;
 
@@ -293,20 +271,16 @@ class Website
 
     /**
      * Get version.
-     *
-     * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
 
     /**
      * Set data.
-     *
-     * @return Website
      */
-    public function setData(array $data = null)
+    public function setData(array $data = null): self
     {
         $this->data = $data;
 
@@ -315,15 +289,13 @@ class Website
 
     /**
      * Get data.
-     *
-     * @return null|array
      */
-    public function getData()
+    public function getData(): ?array
     {
         return $this->data ?? [];
     }
 
-    public function addData(array $data)
+    public function addData(array $data): self
     {
         return $this->setData(array_merge($this->getData(), $data));
     }
@@ -332,10 +304,8 @@ class Website
      * Set comments.
      *
      * @param string $comments
-     *
-     * @return Website
      */
-    public function setComments($comments)
+    public function setComments($comments): self
     {
         $this->comments = $comments;
 
@@ -347,7 +317,7 @@ class Website
      *
      * @return string
      */
-    public function getComments()
+    public function getComments(): ?string
     {
         return $this->comments;
     }
@@ -388,7 +358,7 @@ class Website
         return $this;
     }
 
-    public static function getValuesList($property)
+    public static function getValuesList($property): array
     {
         return WebsiteRepository::getValuesList($property);
     }
@@ -431,14 +401,14 @@ class Website
         return $this;
     }
 
-    public function getActive(): ?bool
+    public function getEnabled(): ?bool
     {
-        return $this->active;
+        return $this->enabled;
     }
 
-    public function setActive(bool $active): self
+    public function setEnabled(bool $enabled): self
     {
-        $this->active = $active;
+        $this->enabled = $enabled;
 
         return $this;
     }

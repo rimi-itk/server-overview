@@ -1,18 +1,18 @@
 {% if view == 'list' %}
-	{% for app, info in value %}
-		{% if value[app]['version']|default(false) %}
-			<span class="label label-primary">{{ app }} {{ value[app]['version']|default('–') }}</span>
-		{% endif %}
-	{% endfor %}
+    {% for app, info in value %}
+        {% if value[app]['version']|default(false) %}
+            <span class="label label-primary">{{ app }} {{ value[app]['version']|default('–') }}</span>
+        {% endif %}
+    {% endfor %}
 {% elseif view == 'show' %}
-	<table class="table">
-		{% for app, info in value %}
-			<tr>
-				{% if value[app]['version']|default(false) %}
-					<th>{{ app }}</th>
-					<td>{{ value[app]['version']|default('–') }}</td>
-				{% endif %}
-			</tr>
-		{% endfor %}
-	</table>
+    <table class="table">
+        {% for app, info in value %}
+            <tr>
+                {% if value[app]['version']|default(false) %}
+                    <th>{{ app }}</th>
+                    <td>{{ value[app]['version']|default('–') }}</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
 {% endif %}

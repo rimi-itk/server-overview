@@ -7,7 +7,7 @@ $finder = PhpCsFixer\Finder::create()
 $header =<<<'HEADER'
 This file is part of ITK Sites.
 
-(c) 2018–2019 ITK Development
+(c) 2018–2020 ITK Development
 
 This source file is subject to the MIT license.
 HEADER;

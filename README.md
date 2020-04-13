@@ -1,11 +1,9 @@
-# server-overview
-
-## Installation
+# itksites
 
 ```sh
 composer install
-bin/console doctrine:database:create
 bin/console doctrine:migrations:migrate --no-interaction
+symfony serve
 ```
 
 Update server data:
@@ -38,22 +36,8 @@ Get updates data for each website:
 bin/console app:website:updates
 ```
 
-## Deployment
+## API
 
-Create `hosts.yaml`:
+Regexp
 
-```yaml
-itksites.example.com:
-  stage: production
-  roles: app
-  deploy_path: /data/www/{{application}}/htdocs
-  env:
-    APP_ENV: prod
-    DATABASE_URL: mysql://itksites:password@127.0.0.1:3306/itksites
-```
-
-Deploy the application:
-
-```sh
-./vendor/bin/dep deploy production
-```
+`https://127.0.0.1:8000/api/websites.jsonld?regexp_type=dru|pal`

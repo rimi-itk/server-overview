@@ -3,7 +3,7 @@
 /*
  * This file is part of ITK Sites.
  *
- * (c) 2018–2019 ITK Development
+ * (c) 2018–2020 ITK Development
  *
  * This source file is subject to the MIT license.
  */
@@ -19,7 +19,7 @@ class DetectCommand extends AbstractCommand
 {
     protected static $defaultName = 'app:website:detect';
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this
@@ -27,7 +27,7 @@ class DetectCommand extends AbstractCommand
             ->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Type of sites to process');
     }
 
-    protected function runCommand()
+    protected function runCommand(): void
     {
         $types = $this->input->getOption('type');
         $websites = $types ? $this->getWebsitesByTypes($types) : $this->getWebsites();
@@ -35,7 +35,7 @@ class DetectCommand extends AbstractCommand
         $detectors = $this->getDetectors();
 
         foreach ($websites as $website) {
-            $this->notice(sprintf('%-40s%-40s', $website->getServerName(), $website->getDomain()));
+            $this->info(sprintf('%-40s%-40s', $website->getServerName(), $website->getDomain()));
 
             foreach ($detectors as $detector) {
                 $command = 'cd '.$website->getDocumentRoot().' && '.$detector->getCommand($website);
@@ -63,14 +63,14 @@ class DetectCommand extends AbstractCommand
     /**
      * @return AbstractDetector[]
      */
-    private function getDetectors()
+    private function getDetectors(): array
     {
         return [
             // Proxy
             new class(Website::TYPE_PROXY) extends AbstractDetector {
                 protected $command = 'true';
 
-                public function getVersion(string $output, Website $website)
+                public function getVersion(string $output, Website $website): ?string
                 {
                     return filter_var($website->getDocumentRoot(), FILTER_VALIDATE_URL) ? Website::VERSION_UNKNOWN : null;
                 }
@@ -78,16 +78,16 @@ class DetectCommand extends AbstractCommand
 
             // Drupal (multisite)
             new class(Website::TYPE_DRUPAL_MULTISITE) extends AbstractDetector {
-                public function getCommand(Website $website)
+                public function getCommand(Website $website): string
                 {
                     $siteDirectory = 'sites/'.$website->getDomain();
 
                     return "[ -e $siteDirectory ] && cd $siteDirectory && hash drush 2>/dev/null && drush status --format=json";
                 }
 
-                public function getVersion(string $output, Website $website)
+                public function getVersion(string $output, Website $website): ?string
                 {
-                    $data = json_decode($output, true);
+                    $data = $this->parseJson($output);
 
                     return $data['drupal-version'] ?? null;
                 }
@@ -97,21 +97,21 @@ class DetectCommand extends AbstractCommand
             new class(Website::TYPE_DRUPAL) extends AbstractDetector {
                 protected $command = 'hash drush 2>/dev/null && drush status --format=json';
 
-                public function getVersion(string $output, Website $website)
+                public function getVersion(string $output, Website $website): ?string
                 {
-                    $data = json_decode($output, true);
+                    $data = $this->parseJson($output);
 
                     return $data['drupal-version'] ?? null;
                 }
             },
 
-            // Symfony 4
+            // Symfony 4 and 5
             new class(Website::TYPE_SYMFONY) extends AbstractDetector {
                 protected $command = '[ -e ../bin/console ] && APP_ENV=prod ../bin/console --version 2>/dev/null';
 
-                public function getVersion(string $output, Website $website)
+                public function getVersion(string $output, Website $website): ?string
                 {
-                    return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output, $matches) ? $matches['version'] : null;
+                    return preg_match('/symfony\s+(?<version>\S+)/i', $output, $matches) ? $matches['version'] : null;
                 }
             },
 
@@ -119,9 +119,9 @@ class DetectCommand extends AbstractCommand
             new class(Website::TYPE_SYMFONY) extends AbstractDetector {
                 protected $command = '[ -e ../bin/console ] && ../bin/console --env=prod --version 2>/dev/null';
 
-                public function getVersion(string $output, Website $website)
+                public function getVersion(string $output, Website $website): ?string
                 {
-                    return preg_match('/symfony\s+(?<version>[^\s]+)/i', $output, $matches) ? $matches['version'] : null;
+                    return preg_match('/symfony\s+(?<version>\S+)/i', $output, $matches) ? $matches['version'] : null;
                 }
             },
 
@@ -129,9 +129,9 @@ class DetectCommand extends AbstractCommand
             new class(Website::TYPE_SYMFONY) extends AbstractDetector {
                 protected $command = '[ -e ../app/console ] && ../app/console --env=prod --version 2>/dev/null';
 
-                public function getVersion(string $output, Website $website)
+                public function getVersion(string $output, Website $website): ?string
                 {
-                    return preg_match('/version\s+(?<version>[^\s]+)/i', $output, $matches) ? $matches['version'] : null;
+                    return preg_match('/version\s+(?<version>\S+)/i', $output, $matches) ? $matches['version'] : null;
                 }
             },
 
@@ -139,7 +139,7 @@ class DetectCommand extends AbstractCommand
             new class(Website::TYPE_UNKNOWN) extends AbstractDetector {
                 protected $command = 'true';
 
-                public function getVersion(string $output, Website $website)
+                public function getVersion(string $output, Website $website): ?string
                 {
                     return Website::VERSION_UNKNOWN;
                 }
