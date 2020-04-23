@@ -67,29 +67,29 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "coding-standards/check/php-cs-fixer": [
+        "coding-standards-check/php-cs-fixer": [
             "php -n vendor/bin/php-cs-fixer --config=.php_cs.dist fix --dry-run"
         ],
-        "coding-standards/check/phpcs": [
+        "coding-standards-check/phpcs": [
             "vendor/bin/phpcs --standard=phpcs.xml.dist"
         ],
-        "coding-standards/check/twigcs": [
+        "coding-standards-check/twigcs": [
             "twigcs templates"
         ],
-        "coding-standards/check": [
-            "@coding-standards/check/php-cs-fixer",
-            "@coding-standards/check/phpcs",
-            "@coding-standards/check/twigcs"
+        "coding-standards-check": [
+            "@coding-standards-check/php-cs-fixer",
+            "@coding-standards-check/phpcs",
+            "@coding-standards-check/twigcs"
         ],
-        "coding-standards/apply/php-cs-fixer": [
+        "coding-standards-apply/php-cs-fixer": [
             "php -n vendor/bin/php-cs-fixer --config=.php_cs.dist fix"
         ],
-        "coding-standards/apply/phpcs": [
+        "coding-standards-apply/phpcs": [
             "vendor/bin/phpcbf --standard=phpcs.xml.dist"
         ],
-        "coding-standards/apply": [
-            "@coding-standards/apply/php-cs-fixer",
-            "@coding-standards/apply/phpcs"
+        "coding-standards-apply": [
+            "@coding-standards-apply/php-cs-fixer",
+            "@coding-standards-apply/phpcs"
         ]
     },
     "conflict": {
