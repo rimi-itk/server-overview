@@ -61,6 +61,12 @@ class Server implements JsonSerializable
      */
     private $enabled;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups("read")
+     */
+    private $search;
+
     public function __construct()
     {
         $this->websites = new ArrayCollection();
@@ -139,6 +145,26 @@ class Server implements JsonSerializable
     public function setEnabled(bool $enabled): self
     {
         $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSearch(): ?string
+    {
+        return $this->search;
+    }
+
+    /**
+     * @param mixed $search
+     *
+     * @return Server
+     */
+    public function setSearch(?string $search): self
+    {
+        $this->search = $search;
 
         return $this;
     }
