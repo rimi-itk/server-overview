@@ -112,6 +112,7 @@ easy_admin:
                      - property: data
                        template: easy_admin/Server/data.html.twig
                      - property: websites
+                     - property: search
 
              form:
                  fields:
