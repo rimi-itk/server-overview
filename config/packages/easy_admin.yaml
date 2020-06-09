@@ -80,7 +80,7 @@ easy_admin:
              class: App\Entity\Server
              disabled_actions: ['delete']
              list:
-                 filters: ['name']
+                 filters: ['enabled', 'name']
 
                  actions: ['show']
                  max_results: 100
