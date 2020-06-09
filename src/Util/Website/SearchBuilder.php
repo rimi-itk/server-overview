@@ -46,6 +46,11 @@ class SearchBuilder
             $data[] = $item;
         }
 
+        $serverSearchData = $website->getServer()->getSearch();
+        foreach (explode(' ', $serverSearchData) as $item) {
+            $data[] = 'server:'.$item;
+        }
+
         return implode(' ', $data);
     }
 
