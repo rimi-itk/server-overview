@@ -107,7 +107,12 @@ easy_admin:
                      - property: websites
                      - property: search
 
-             form:
+             new:
+                 fields:
+                     - property: name
+                     - property: enabled
+
+             edit:
                  fields:
                      - property: name
                        type_options:
