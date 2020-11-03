@@ -17,6 +17,7 @@ easy_admin:
               params:
                   _format: csv
                   pagination: false
+                  enabled: true
 
     formats:
         datetime: 'd/m/Y H:i:s'

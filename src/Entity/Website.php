@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     itemOperations={"get"},
  *     normalizationContext={"groups"={"read"}}
  * )
- * @ApiFilter(SearchFilter::class, properties={"domain", "server.name", "type", "version", "data": "partial", "search": "partial"})
+ * @ApiFilter(SearchFilter::class, properties={"enabled", "domain", "server.name", "type", "version", "data": "partial", "search": "partial"})
  * @ApiFilter(RegexpFilter::class, properties={"domain", "server.name", "type", "version", "data", "search"})
  */
 class Website
